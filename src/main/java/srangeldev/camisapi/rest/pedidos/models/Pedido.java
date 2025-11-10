@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import srangeldev.camisapi.rest.users.models.User;
-import srangeldev.camisapi.rest.usuarios.models.Usuario;
 
 import java.util.Date;
 
@@ -23,7 +22,7 @@ import java.util.Date;
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private Long id;
 
     @NotNull(message = "El usuario no puede ser nulo")
     @ManyToOne

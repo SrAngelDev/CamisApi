@@ -20,7 +20,7 @@ import srangeldev.camisapi.rest.productos.models.StockCamiseta;
 public class DetallePedido {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private Long id;
 
     @NotNull(message = "El pedido no puede ser nulo")
     @ManyToOne
