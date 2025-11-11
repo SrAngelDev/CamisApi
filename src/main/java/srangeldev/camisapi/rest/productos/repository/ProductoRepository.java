@@ -8,7 +8,7 @@ import srangeldev.camisapi.rest.productos.models.Producto;
 import java.util.List;
 
 @Repository
-public interface ProductoRepository extends MongoRepository<Producto, String> {
+public interface ProductoRepository extends MongoRepository<Producto, Long> {
 
     // Buscar productos por nombre ignorando mayúsculas y minúsculas
     List<Producto> findByNombreIgnoreCase(String nombre);

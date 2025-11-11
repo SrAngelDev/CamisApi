@@ -20,7 +20,7 @@ public class ProductoController {
     private final ProductoService productoService;
 
     /**
-     * 🟢 Crear un nuevo producto
+     * Crear un nuevo producto
      */
     @PostMapping
     public ResponseEntity<ProductoResponseDTO> crearProducto(
@@ -31,7 +31,7 @@ public class ProductoController {
     }
 
     /**
-     * 🔵 Listar todos los productos
+     * Listar todos los productos
      */
     @GetMapping
     public ResponseEntity<List<ProductoResponseDTO>> listarProductos() {
@@ -39,21 +39,22 @@ public class ProductoController {
         return ResponseEntity.ok(productos);
     }
 
+
     /**
-     * 🟠 Obtener un producto por ID
+     * Obtener un producto por ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable String id) {
+    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable Long id) {
         ProductoResponseDTO producto = productoService.obtenerPorId(id);
         return ResponseEntity.ok(producto);
     }
 
     /**
-     * 🟣 Actualizar un producto existente
+     * Actualizar un producto existente
      */
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponseDTO> actualizarProducto(
-            @PathVariable String id,
+            @PathVariable Long id,
             @Valid @RequestBody ProductoRequestDTO productoRequestDTO) {
 
         ProductoResponseDTO actualizado = productoService.actualizarProducto(id, productoRequestDTO);
@@ -61,16 +62,16 @@ public class ProductoController {
     }
 
     /**
-     * 🔴 Eliminar un producto por ID
+     * Eliminar un producto por ID
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarProducto(@PathVariable String id) {
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * 🔍 Buscar productos por nombre (parcial)
+     * Buscar productos por nombre (parcial)
      */
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<ProductoResponseDTO>> buscarPorNombre(@RequestParam String nombre) {
@@ -79,7 +80,7 @@ public class ProductoController {
     }
 
     /**
-     * 🔍 Buscar productos por equipo
+     * Buscar productos por equipo
      */
     @GetMapping("/buscar/equipo")
     public ResponseEntity<List<ProductoResponseDTO>> buscarPorEquipo(@RequestParam String equipo) {
@@ -88,7 +89,7 @@ public class ProductoController {
     }
 
     /**
-     * 🔍 Buscar productos por estado
+     * Buscar productos por estado
      */
     @GetMapping("/buscar/estado")
     public ResponseEntity<List<ProductoResponseDTO>> buscarPorEstado(@RequestParam EstadoProducto estado) {

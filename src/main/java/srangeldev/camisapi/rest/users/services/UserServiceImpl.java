@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
         // Comprobamos si ya existe un usuario con ese username
         userRepository.findByUsernameIgnoreCase(userCreateRequestDto.getUsername())
                 .ifPresent(u -> {
-                    throw new UserBadRequest("Ya existe un usuario con el username: " + userCreateRequestDto.getUsername());
+                    throw new srangeldev.camisapi.rest.usuarios.exceptions.UserBadRequest("Ya existe un usuario con el username: " + userCreateRequestDto.getUsername());
                 });
     }
 
@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
             userRepository.findByUsernameIgnoreCase(userUpdateRequestDto.getUsername())
                     .ifPresent(existingUser -> {
                         if (!existingUser.getId().equals(id)) {
-                            throw new UserBadRequest("El username '" + userUpdateRequestDto.getUsername() + "' ya está en uso por otro usuario.");
+                            throw new srangeldev.camisapi.rest.usuarios.exceptions.UserBadRequest("El username '" + userUpdateRequestDto.getUsername() + "' ya está en uso por otro usuario.");
                         }
                     });
         }

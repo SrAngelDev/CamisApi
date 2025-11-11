@@ -51,7 +51,7 @@ public class ProductoService {
     /**
      * Busca un producto por su ID.
      */
-    public ProductoResponseDTO obtenerPorId(String id) {
+    public ProductoResponseDTO obtenerPorId(Long id) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNotFound("No se encontró el producto con ID: " + id));
 
@@ -61,7 +61,7 @@ public class ProductoService {
     /**
      * Actualiza un producto existente.
      */
-    public ProductoResponseDTO actualizarProducto(String id, ProductoRequestDTO dto) {
+    public ProductoResponseDTO actualizarProducto(Long id, ProductoRequestDTO dto) {
         Producto existente = productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNotFound("No se puede actualizar. No existe el producto con ID: " + id));
 
@@ -82,7 +82,7 @@ public class ProductoService {
     /**
      * Elimina un producto por su ID.
      */
-    public void eliminarProducto(String id) {
+    public void eliminarProducto(Long id) {
         if (!productoRepository.existsById(id)) {
             throw new ProductoNotFound("No se puede eliminar. No existe el producto con ID: " + id);
         }

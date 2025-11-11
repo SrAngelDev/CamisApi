@@ -11,11 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import srangeldev.camisapi.rest.users.dto.UserCreateRequestDto;
 import srangeldev.camisapi.rest.users.dto.UserResponseDto;
 import srangeldev.camisapi.rest.users.dto.UserUpdateRequestDto;
-import srangeldev.camisapi.rest.users.exceptions.UserBadRequest;
 import srangeldev.camisapi.rest.users.mappers.UserMapper;
 import srangeldev.camisapi.rest.users.models.Rol;
 import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.users.repositories.UserRepository;
+import srangeldev.camisapi.rest.usuarios.exceptions.UserBadRequest;
 
 import java.time.LocalDateTime;
 import java.util.*;
