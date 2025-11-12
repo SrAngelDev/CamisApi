@@ -25,7 +25,6 @@ public class CarritoCreateRequestDto {
      * Obligatorio para asociar el carrito a un usuario específico
      */
     @NotNull(message = "El ID del usuario es obligatorio")
-    @Positive(message = "El ID del usuario debe ser un número positivo")
     private Long userId;
 
     /**
