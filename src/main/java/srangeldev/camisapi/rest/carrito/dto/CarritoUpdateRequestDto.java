@@ -21,6 +21,12 @@ import java.util.List;
 public class CarritoUpdateRequestDto {
 
     /**
+     * ID del carrito a actualizar
+     */
+    @NotNull(message = "El ID del carrito no puede ser nulo")
+    private Long id;
+
+    /**
      * Lista actualizada de IDs de productos
      */
     @NotNull(message = "La lista de items no puede ser nula")

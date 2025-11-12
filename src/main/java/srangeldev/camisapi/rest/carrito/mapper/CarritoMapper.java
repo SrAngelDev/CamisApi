@@ -68,6 +68,11 @@ public class CarritoMapper {
             return carrito;
         }
 
+        // Validar que el ID del DTO coincida con el ID de la entidad
+        if (updateDto.getId() != null && !updateDto.getId().equals(carrito.getId())) {
+            throw new IllegalArgumentException("El ID del carrito en la URL no coincide con el ID del DTO");
+        }
+
         // Procesar según la acción especificada
         String accion = updateDto.getAccion();
 
