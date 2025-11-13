@@ -8,12 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO DetallePedidoDto
- *
- * Representa los datos del producto en el momento de la venta.
- * Equivalente a la subentidad embebida DetallePedido.
- */
+
 @Data
 @Builder
 @NoArgsConstructor

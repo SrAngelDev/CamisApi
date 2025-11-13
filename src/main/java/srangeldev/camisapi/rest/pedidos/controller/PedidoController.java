@@ -23,9 +23,9 @@ public class PedidoController {
      * Crea un nuevo pedido
      */
     @PostMapping
-    public ResponseEntity<PedidoResponseDto> crearPedido(@RequestBody PedidoRequestDto pedidoRequest) {
+    public ResponseEntity<PedidoResponseDto> crearPedido(@Valid @RequestBody PedidoRequestDto pedidoRequest) {
         PedidoResponseDto nuevoPedido = pedidoService.crearPedido(pedidoRequest);
-        return ResponseEntity.ok(nuevoPedido);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPedido);
     }
 
     /**
@@ -51,7 +51,7 @@ public class PedidoController {
      * Obtiene pedidos por el ID del usuario (String, MongoDB)
      */
     @GetMapping("/usuario/{userId}")
-    public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(@PathVariable Long userId) {
+    public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(@PathVariable String userId) {
         List<PedidoResponseDto> pedidos = pedidoService.obtenerPorUsuario(userId);
         return ResponseEntity.ok(pedidos);
     }

@@ -27,7 +27,7 @@ public interface PedidoService {
     /**
      * Obtiene los pedidos por ID de usuario.
      */
-    List<PedidoResponseDto> obtenerPorUsuario(Long userId);
+    List<PedidoResponseDto> obtenerPorUsuario(String userId);
 
     /**
      * Obtiene un pedido por su ID.

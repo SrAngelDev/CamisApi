@@ -13,7 +13,12 @@ import java.util.stream.Collectors;
 @Component
 public class PedidoMappers {
 
-    // De ResponseDto a Pedido
+    /**
+     * Convertimos el PedidoRequestDto recibido a la entidad Pedido.
+     *
+     * @param dto el objeto con los datos del pedido provenientes de la solicitud.
+     * @return una instancia de Pedido con los valores correspondientes.
+     */
     public Pedido toPedido(PedidoRequestDto dto) {
         return Pedido.builder()
                 .userId(dto.getUserId())
@@ -23,7 +28,13 @@ public class PedidoMappers {
                         .collect(Collectors.toList()))
                 .build();
     }
-
+    /**
+     * Convierte  DetallePedidoDto a la entidad  DetallePedido.
+     * Utilizado al crear un pedido nuevo a partir de los datos enviados por el usuario.
+     *
+     * @param dto el detalle del pedido en formato DTO.
+     * @return una instancia de DetallePedido con sus datos correspondientes.
+     */
     public DetallePedido toDetallePedido(DetallePedidoDto dto) {
         return DetallePedido.builder()
                 .productoId(dto.getProductoId())
@@ -35,7 +46,13 @@ public class PedidoMappers {
                 .build();
     }
 
-    // 🧩 Entidad → DTO
+    /**
+     * Convierte la entidad Pedido a PedidoResponseDto.
+     * Incluye la lista de detalles del pedido transformada a DTOs.
+     *
+     * @param pedido la entidad del pedido obtenida desde la base de datos.
+     * @return un objeto PedidoResponseDto con la información lista para ser serializada.
+     */
     public PedidoResponseDto toResponseDto(Pedido pedido) {
         return new PedidoResponseDto(
                 pedido.getId(),
@@ -50,7 +67,13 @@ public class PedidoMappers {
                         .toList()
         );
     }
-
+    /**
+     * Convierte la entidad DetallePedido aDetallePedidoDto.
+     * Se usa en conjunto con #toResponseDto(Pedido)}.
+     *
+     * @param entity la entidad de detalle del pedido.
+     * @return el DTO equivalente del detalle del pedido.
+     */
     public DetallePedidoDto toDetallePedidoDto(DetallePedido entity) {
         return new DetallePedidoDto(
                 entity.getProductoId(),
@@ -61,8 +84,13 @@ public class PedidoMappers {
                 entity.getImageUrl()
         );
     }
-
-    // 🧩 Lista de pedidos → lista de DTOs (tu estilo preferido)
+    /**
+     * Convierte una lista de entidades Pedido en una lista de PedidoResponseDto.
+     * Para respuestas que devuelven múltiples pedidos.
+     *
+     * @param pedidos lista de entidades de Pedido.
+     * @return lista de objetos PedidoResponseDto con los datos transformados.
+     */
     public List<PedidoResponseDto> toResponseList(List<Pedido> pedidos) {
         return pedidos.stream()
                 .map(p -> new PedidoResponseDto(
