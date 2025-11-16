@@ -15,7 +15,7 @@ import srangeldev.camisapi.rest.users.exceptions.UserNotFound;
 import srangeldev.camisapi.rest.users.mappers.UserMapper;
 import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.users.repositories.UserRepository;
-import srangeldev.camisapi.rest.usuarios.exceptions.UserBadRequest;
+import srangeldev.camisapi.rest.users.exceptions.UserBadRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;

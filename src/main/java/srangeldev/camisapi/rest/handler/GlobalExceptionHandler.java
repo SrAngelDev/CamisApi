@@ -1,4 +1,4 @@
-package srangeldev.camisapi.rest.productos.handler;
+package srangeldev.camisapi.rest.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import srangeldev.camisapi.rest.productos.exceptions.ProductoNotFound;
+import srangeldev.camisapi.rest.users.exceptions.UserBadId;
+import srangeldev.camisapi.rest.users.exceptions.UserNotFound;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +36,26 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Maneja errores de usuario no encontrado
+     */
+    @ExceptionHandler(UserNotFound.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFound ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Maneja errores de ID de usuario inválido
+     */
+    @ExceptionHandler(UserBadId.class)
+    public ResponseEntity<Map<String, String>> handleUserBadId(UserBadId ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**

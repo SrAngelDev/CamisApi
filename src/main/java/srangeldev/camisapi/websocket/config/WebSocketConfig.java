@@ -28,8 +28,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     }
 
     // Si necesitas exponer más handlers, solo añádelos como beans y rutas diferentes
-    @Bean
-    public WebSocketHandler productosWebSocketHandler() {
-        return new ProductosWebSocketHandler();
-    }
+    //@Bean
+    //public WebSocketHandler productosWebSocketHandler() {
+        //return new ProductosWebSocketHandler();
+    //}
 }

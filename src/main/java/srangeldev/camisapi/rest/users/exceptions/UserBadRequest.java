@@ -1,4 +1,4 @@
-package srangeldev.camisapi.rest.usuarios.exceptions;
+package srangeldev.camisapi.rest.users.exceptions;
 
 import srangeldev.camisapi.rest.users.exceptions.UserException;
 
