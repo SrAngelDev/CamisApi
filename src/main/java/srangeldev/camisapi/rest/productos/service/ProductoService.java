@@ -36,7 +36,6 @@ public class ProductoService {
         }
 
         Producto guardado = productoRepository.save(producto);
-        productosWebSocketHandler.broadcastObject(productoMapper.toDTO(guardado));
         return productoMapper.toDTO(guardado);
     }
 
