@@ -8,7 +8,6 @@ import srangeldev.camisapi.rest.pedidos.dto.PedidoRequestDto;
 import srangeldev.camisapi.rest.pedidos.dto.PedidoResponseDto;
 import srangeldev.camisapi.rest.pedidos.models.EstadoPedido;
 import srangeldev.camisapi.rest.pedidos.services.PedidoService;
-import jakarta.validation.Valid;
 
 
 import java.util.List;
@@ -55,7 +54,7 @@ public class PedidoController {
      */
     @GetMapping("/usuario/{userId}")
     public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(@PathVariable Long userId) {
-        List<PedidoResponseDto> pedidos = pedidoService.obtenerPorUsuario(userId);
+        List<PedidoResponseDto> pedidos = pedidoService.findByUsuario(userId);
         return ResponseEntity.ok(pedidos);
     }
 
@@ -64,7 +63,7 @@ public class PedidoController {
      */
     @GetMapping("/estado")
     public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorEstado(@RequestParam EstadoPedido estado) {
-        List<PedidoResponseDto> pedidos = pedidoService.obtenerPorEstado(estado);
+        List<PedidoResponseDto> pedidos = pedidoService.buscarPorEstado(estado);
         return ResponseEntity.ok(pedidos);
     }
 

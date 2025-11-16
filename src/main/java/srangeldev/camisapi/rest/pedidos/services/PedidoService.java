@@ -3,10 +3,9 @@ package srangeldev.camisapi.rest.pedidos.services;
 import srangeldev.camisapi.rest.pedidos.dto.PedidoRequestDto;
 import srangeldev.camisapi.rest.pedidos.dto.PedidoResponseDto;
 import srangeldev.camisapi.rest.pedidos.models.EstadoPedido;
-import srangeldev.camisapi.rest.pedidos.models.Pedido;
 
 import java.util.List;
-import java.util.Optional;
+
 /**
  * Servicio PedidoService
  *
@@ -27,12 +26,12 @@ public interface PedidoService {
     /**
      * Obtiene los pedidos por ID de usuario.
      */
-    List<PedidoResponseDto> obtenerPorUsuario(Long userId);
+    List<PedidoResponseDto> findByUsuario(Long userId);
 
     /**
      * Obtiene un pedido por su ID.
      */
-    PedidoResponseDto obtenerPorId(Long pedidoId);
+    PedidoResponseDto obtenerPorId(Long id);
 
     /**
      * Cambia el estado de un pedido (por ejemplo, de PENDIENTE_PAGO a PAGADO).
@@ -42,7 +41,7 @@ public interface PedidoService {
     /**
      * Busca pedidos por estado.
      */
-    List<PedidoResponseDto> obtenerPorEstado(EstadoPedido estado);
+    List<PedidoResponseDto> buscarPorEstado(EstadoPedido estado);
 
     /**
      * Eliminar Pedido.

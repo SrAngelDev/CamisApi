@@ -53,7 +53,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     // Obtiene los pedidos del usuario específico
     @Override
-    public List<PedidoResponseDto> obtenerPorUsuario(Long userId) {
+    public List<PedidoResponseDto> findByUsuario(Long userId) {
         List<Pedido> pedidos = pedidoRepository.findByUserId(userId);
         return pedidoMapper.toResponseList(pedidos);
     }
@@ -94,8 +94,8 @@ public class PedidoServiceImpl implements PedidoService {
 
     // Pedidos filtrados por estado
     @Override
-    public List<PedidoResponseDto> obtenerPorEstado(EstadoPedido estado) {
-        return pedidoMapper.toResponseList(pedidoRepository.pedidosPorEstado(estado));
+    public List<PedidoResponseDto> buscarPorEstado(EstadoPedido estado) {
+        return pedidoMapper.toResponseList(pedidoRepository.findByEstado(estado));
     }
 
     //Eliminamos el pedido correspondiente al Id

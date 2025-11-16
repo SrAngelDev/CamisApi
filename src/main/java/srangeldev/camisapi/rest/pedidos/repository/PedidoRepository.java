@@ -32,5 +32,5 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long>{
      * @return lista de pedidos con el estado
      */
     @Query("SELECT p FROM Pedido p WHERE p.estado = :estado")
-    List<Pedido> pedidosPorEstado(EstadoPedido estado);
+    List<Pedido> findByEstado(EstadoPedido estado);
 }
