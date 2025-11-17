@@ -139,16 +139,15 @@ class CarritoServiceImplTest {
     @Test
     @DisplayName("update - Debe actualizar carrito existente")
     void testUpdate_Exitoso() {
-        // Given - El DTO tiene el mismo ID que el path parameter, por lo que no debe lanzar excepción
-        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito)); // Para la verificación de ID
-        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito)); // Para obtener el carrito a actualizar
+        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
+        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
         when(carritoRepository.save(any(Carrito.class))).thenReturn(carrito);
         when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponseDto);
 
         CarritoResponseDto resultado = carritoService.update(1L, carritoUpdateRequestDto);
 
         assertThat(resultado.getId()).isEqualTo(1L);
-        verify(carritoRepository, times(2)).findById(1L); // Se llama dos veces en el servicio
+        verify(carritoRepository, times(2)).findById(1L);
         verify(carritoRepository).save(any(Carrito.class));
         verify(carritoMapper).updateFromDto(carrito, carritoUpdateRequestDto);
     }
@@ -156,11 +155,10 @@ class CarritoServiceImplTest {
     @Test
     @DisplayName("update - Debe lanzar excepción cuando carrito no existe")
     void testUpdate_CarritoNoExiste() {
-        // Given - Configuramos que no encuentra el carrito con el ID del DTO
-        when(carritoRepository.findById(1L)).thenReturn(Optional.empty()); // Para verificación de ID
-        when(carritoRepository.findById(1L)).thenReturn(Optional.empty()); // Para obtener el carrito a actualizar
+        when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
+        when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When & Then
+
         assertThrows(CarritoNotFound.class, () -> carritoService.update(1L, carritoUpdateRequestDto));
 
         verify(carritoRepository, times(2)).findById(1L);
@@ -169,19 +167,16 @@ class CarritoServiceImplTest {
     @Test
     @DisplayName("update - Debe lanzar excepción cuando ID ya existe en otro carrito")
     void testUpdate_IdYaExisteEnOtroCarrito() {
-        // Given - Configuramos un DTO con ID diferente al path parameter
         CarritoUpdateRequestDto dtoConIdDiferente = CarritoUpdateRequestDto.builder()
-                .id(2L) // ID diferente al path parameter (1L)
+                .id(2L)
                 .items(Arrays.asList("item1", "item2"))
                 .accion("REEMPLAZAR")
                 .productoId("item2")
                 .build();
 
-        // Simulamos que existe un carrito con ID 2L (diferente al path parameter 1L)
         Carrito otroCarrito = Carrito.builder().id(2L).userId(102L).build();
         when(carritoRepository.findById(2L)).thenReturn(Optional.of(otroCarrito));
 
-        // When & Then
         assertThrows(CarritoException.class, () -> carritoService.update(1L, dtoConIdDiferente));
 
         verify(carritoRepository).findById(2L);
