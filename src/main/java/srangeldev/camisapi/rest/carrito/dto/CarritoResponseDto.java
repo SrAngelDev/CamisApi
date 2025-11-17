@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import srangeldev.camisapi.rest.productos.models.Producto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,12 +34,12 @@ public class CarritoResponseDto {
      * Lista de IDs de productos en el carrito
      * Referencias a productos en MongoDB
      */
-    private List<String> items;
+    private List<Producto> productos;
 
     /**
      * Número total de items en el carrito
      */
-    private Integer totalItems;
+    private Integer totalProductos;
 
     /**
      * Fecha de última modificación

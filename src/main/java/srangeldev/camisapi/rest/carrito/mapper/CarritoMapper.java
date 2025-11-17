@@ -29,7 +29,7 @@ public class CarritoMapper {
 
         return Carrito.builder()
                 .userId(createDto.getUserId())
-                .items(createDto.getItems() != null ? new ArrayList<>(createDto.getItems()) : new ArrayList<>())
+                .productos(createDto.getProductos() != null ? new ArrayList<>(createDto.getProductos()) : new ArrayList<>())
                 .creadoEn(LocalDateTime.now())
                 .modificadoEn(LocalDateTime.now())
                 .build();
@@ -49,8 +49,8 @@ public class CarritoMapper {
         return CarritoResponseDto.builder()
                 .id(carrito.getId())
                 .userId(carrito.getUserId())
-                .items(carrito.getItems())
-                .totalItems(carrito.getItems() != null ? carrito.getItems().size() : 0)
+                .productos(carrito.getProductos())
+                .totalProductos(carrito.getProductos() != null ? carrito.getProductos().size() : 0)
                 .modificadoEn(carrito.getModificadoEn())
                 .creadoEn(carrito.getCreadoEn())
                 .build();
@@ -78,22 +78,22 @@ public class CarritoMapper {
 
         if ("REEMPLAZAR".equals(accion) || accion == null) {
             // Reemplazar toda la lista de items
-            if (updateDto.getItems() != null) {
-                carrito.setItems(new ArrayList<>(updateDto.getItems()));
+            if (updateDto.getProductos() != null) {
+                carrito.setProductos(new ArrayList<>(updateDto.getProductos()));
             }
         } else if ("AGREGAR".equals(accion)) {
             // Agregar un producto específico
-            if (updateDto.getProductoId() != null && !carrito.getItems().contains(updateDto.getProductoId())) {
-                carrito.getItems().add(updateDto.getProductoId());
+            if (updateDto.getProductoId() != null && !carrito.getProductos().contains(updateDto.getProductoId())) {
+                carrito.getProductos().add(updateDto.getProductoId());
             }
         } else if ("QUITAR".equals(accion)) {
             // Quitar un producto específico
             if (updateDto.getProductoId() != null) {
-                carrito.getItems().remove(updateDto.getProductoId());
+                carrito.getProductos().remove(updateDto.getProductoId());
             }
         } else if ("LIMPIAR".equals(accion)) {
             // Limpiar todo el carrito
-            carrito.getItems().clear();
+            carrito.getProductos().clear();
         }
 
         // La fecha de modificación se actualiza automáticamente con @UpdateTimestamp

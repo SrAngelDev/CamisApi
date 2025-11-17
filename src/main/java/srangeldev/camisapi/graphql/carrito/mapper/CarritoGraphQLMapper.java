@@ -27,7 +27,7 @@ public class CarritoGraphQLMapper {
 
         return CarritoCreateRequestDto.builder()
                 .userId(input.getUserId())
-                .items(input.getItems())
+                .productos(input.getProductos())
                 .build();
     }
 
@@ -42,8 +42,8 @@ public class CarritoGraphQLMapper {
         return CarritoGraphQLResponse.builder()
                 .id(responseDto.getId() != null ? responseDto.getId().toString() : null)
                 .userId(responseDto.getUserId() != null ? responseDto.getUserId().toString() : null)
-                .items(responseDto.getItems())
-                .totalItems(responseDto.getTotalItems())
+                .items(responseDto.getProductos())
+                .totalItems(responseDto.getTotalProductos())
                 .modificadoEn(responseDto.getModificadoEn() != null ?
                     responseDto.getModificadoEn().format(DATE_FORMATTER) : null)
                 .creadoEn(responseDto.getCreadoEn() != null ?

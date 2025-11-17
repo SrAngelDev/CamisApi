@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import srangeldev.camisapi.rest.productos.models.Producto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,5 +33,5 @@ public class CarritoCreateRequestDto {
      * Puede estar vacía al crear el carrito
      */
     @Builder.Default
-    private List<String> items = new ArrayList<>();
+    private List<Producto> productos = new ArrayList<>();
 }

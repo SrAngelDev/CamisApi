@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import srangeldev.camisapi.rest.productos.models.Producto;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class CarritoUpdateRequestDto {
      */
     @NotNull(message = "La lista de items no puede ser nula")
     private List<@NotEmpty(message = "El ID del producto no puede estar vacío")
-                 String> items;
+            Producto> productos;
 
     /**
      * Acción específica para realizar en el carrito
@@ -43,5 +44,5 @@ public class CarritoUpdateRequestDto {
      * ID de producto específico para acciones individuales
      */
    @NotNull(message = "El ID del producto no puede ser nulo")
-    private String productoId;
+    private Long productoId;
 }
