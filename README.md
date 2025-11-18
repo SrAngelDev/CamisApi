@@ -1,4 +1,4 @@
-# CamisApi — Tienda de camisetas exclusivas
+# CamisApi — Tienda de Camisetas de Futbol
 
 CamisApi es una aplicación diseñada como una tienda online para la venta de camisetas de futbol. Muestra a los usuarios interesados en el mundo del fútbol un catálogo de camisetas únicas, donde pueden seleccionar las que más les guste y comprarlas. Primero la añadirían al carrito de la compra, para más tarde realizar la compra. Lo novedoso de esta tienda es que todas las camisetas que se venden son únicas y exclusivas, permitiendo administrar la reserva y venta de cada camiseta, no hay otra en todo el mundo. Así que solo puede existir una unidad disponible, evitando que dos personas quieran comprar el mismo producto. 
 
