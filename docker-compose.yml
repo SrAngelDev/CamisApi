@@ -4,25 +4,11 @@ networks:
 
 volumes:
   nginx-logs:
-  test-reports:
-  doc-reports:
-  coverage-reports:
   mongodb-data:
   redis-data:
   postgres-data:
 
 services:
-  # Extract artifacts from build
-  artifacts:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: artifacts
-    container_name: artifacts
-    volumes:
-      - test-reports:/mnt/test-reports
-      - doc-reports:/mnt/doc-reports
-      - coverage-reports:/mnt/coverage-reports
 
   # Databases
   mongodb:
@@ -72,8 +58,6 @@ services:
     container_name: api
     environment:
       SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - "8080:8080"
     networks:
       - app-network
     depends_on:
@@ -81,39 +65,47 @@ services:
       - postgres
       - redis
 
-  # Report servers
+  # Report servers (sin puertos expuestos, solo accesibles vía nginx)
   test-server:
-    image: httpd:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.reports
+      target: test-server
     container_name: test-server
-    ports:
-      - "8081:80"
-    volumes:
-      - test-reports:/usr/local/apache2/htdocs:ro
     networks:
       - app-network
-    depends_on:
-      - artifacts
 
   doc-server:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.reports
+      target: doc-server
     container_name: doc-server
-    ports:
-      - "8082:80"
-    volumes:
-      - doc-reports:/usr/share/nginx/html:ro
     networks:
       - app-network
-    depends_on:
-      - artifacts
 
   coverage-server:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.reports
+      target: coverage-server
     container_name: coverage-server
+    networks:
+      - app-network
+
+  # Nginx Proxy para unificar todos los servicios en el puerto 8080
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
     ports:
-      - "8083:80"
+      - "80:80"
     volumes:
-      - coverage-reports:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx-logs:/var/log/nginx
     networks:
       - app-network
     depends_on:
-      - artifacts
+      - api
+      - test-server
+      - doc-server
+      - coverage-server

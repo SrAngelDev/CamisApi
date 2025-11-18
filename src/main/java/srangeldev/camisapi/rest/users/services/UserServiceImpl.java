@@ -15,7 +15,7 @@ import srangeldev.camisapi.rest.users.mappers.UserMapper;
 import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.users.repositories.UserRepository;
 import srangeldev.camisapi.rest.users.exceptions.UserBadRequest;
-import srangeldev.camisapi.websocket.config.WebSocketHandler;
+import srangeldev.camisapi.websocket.config.MyWebSocketHandler;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,13 +31,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final WebSocketHandler webSocketHandler;
+    private final MyWebSocketHandler myWebSocketHandler;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, WebSocketHandler webSocketHandler) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, MyWebSocketHandler myWebSocketHandler) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.webSocketHandler = webSocketHandler;
+        this.myWebSocketHandler = myWebSocketHandler;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toUsuarioResponseDto)
                 .toList();
 
-        webSocketHandler.enviarMensajeATodos("Usuarios listados correctamente");
+        myWebSocketHandler.enviarMensajeATodos("Usuarios listados correctamente");
 
         return usuarios;
     }
@@ -57,10 +57,10 @@ public class UserServiceImpl implements UserService {
     @Cacheable(key = "#id")
     public UserResponseDto findById(Long id) {
         log.info("Buscando usuario por id: {}", id);
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
+        User user = userRepository.findByIdUsuario(id)
+                .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado", true));
 
-        webSocketHandler.enviarMensajeATodos("Usuario encontrado con id:" +id);
+        myWebSocketHandler.enviarMensajeATodos("Usuario encontrado con id:" +id);
         return userMapper.toUsuarioResponseDto(user);
     }
 
@@ -77,23 +77,29 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto save(UserCreateRequestDto userCreateRequestDto) {
         log.info("Guardando usuario: {}", userCreateRequestDto);
         
-        // Verificar que no exista un usuario con el mismo idUsuario
-        userRepository.findById(userCreateRequestDto.getIdUsuario()).ifPresent(u -> {
-            throw new UserBadRequest("Ya existe un usuario con el id " + userCreateRequestDto.getIdUsuario());
-        });
-        
         // Verificar que no exista un usuario con el mismo username
         userRepository.findByUsername(userCreateRequestDto.getUsername()).ifPresent(u -> {
             throw new UserBadRequest("Ya existe un usuario con el username " + userCreateRequestDto.getUsername());
         });
 
+        // Generar el siguiente ID de usuario automáticamente
+        Long nextId = userRepository.findFirstByOrderByIdUsuarioDesc()
+                .map(user -> user.getIdUsuario() + 1)
+                .orElse(1L);
+        
+        log.info("Generando ID de usuario automático: {}", nextId);
+
         // Crear nuevo usuario
         User user = userMapper.toUsuario(userCreateRequestDto);
+        user.setIdUsuario(nextId);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         
         // Guardar en MongoDB
         User savedUser = userRepository.save(user);
+        
+        myWebSocketHandler.enviarMensajeATodos("Nuevo usuario creado con id: " + nextId);
+        
         return userMapper.toUsuarioResponseDto(savedUser);
     }
 
@@ -103,8 +109,8 @@ public class UserServiceImpl implements UserService {
         log.info("Actualizando usuario con id {}: {}", id, userUpdateRequestDto);
         
         // Buscar usuario existente
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
+        User existingUser = userRepository.findByIdUsuario(id)
+                .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado", true));
 
         // Verificar username si se está cambiando
         if (userUpdateRequestDto.getUsername() != null && 
@@ -138,13 +144,13 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long id) {
         log.info("Borrando usuario por id: {}", id);
         
-        // Verificar que existe
-        userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
+        // Verificar que existe y obtener el usuario
+        User user = userRepository.findByIdUsuario(id)
+                .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado", true));
         
-        // Borrado físico en MongoDB
-        userRepository.deleteById(id);
+        // Borrado físico en MongoDB usando el ObjectId
+        userRepository.deleteById(user.get_id());
 
-        webSocketHandler.enviarMensajeATodos("Usuario eliminado con id:" +id);
+        myWebSocketHandler.enviarMensajeATodos("Usuario eliminado con id:" +id);
     }
 }

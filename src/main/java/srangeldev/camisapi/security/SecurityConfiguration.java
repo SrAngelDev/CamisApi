@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Configuración de seguridad simple con JWT
- * Implementación básica para estudiantes de DAW
  */
 @Configuration
 @EnableWebSecurity
@@ -30,16 +29,35 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        // Endpoints públicos
+                        // Endpoints públicos de autenticación
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/public").permitAll()
+                        
+                        // GraphQL endpoints
+                        .requestMatchers("/graphql/**").permitAll()
+                        .requestMatchers("/graphiql/**").permitAll()
+                        .requestMatchers("/graphiql").permitAll()
+                        
+                        // Documentación y API Docs (Swagger)
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-resources/**", "/webjars/**").permitAll()
+                        
+                        // WebSocket
+                        .requestMatchers("/ws/**").permitAll()
+                        
+                        // Servidores de reportes y documentación
+                        .requestMatchers("/test/**").permitAll()
+                        .requestMatchers("/doc/**").permitAll()
+                        .requestMatchers("/coverage/**").permitAll()
+                        
+                        // Errores
                         .requestMatchers("/error/**").permitAll()
-                        .requestMatchers("/saludo/**").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        // Endpoints de admin
-                        .requestMatchers("/api/admin").hasRole("ADMIN")
-                        // Resto requiere autenticación
+                        
+                        // Endpoints de la API REST (requieren autenticación)
+                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/api/**").permitAll() // Permitir ver productos
+                        
+                        // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

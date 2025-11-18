@@ -116,7 +116,7 @@ public class PedidoController {
     })
     @GetMapping("/usuario/{userId}")
     public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(
-        @Parameter(description = "ID del usuario (MongoDB)", required = true) @PathVariable String userId) {
+        @Parameter(description = "ID del usuario (MongoDB)", required = true) @PathVariable Long userId) {
         List<PedidoResponseDto> pedidos = pedidoService.findByUsuario(userId);
         return ResponseEntity.ok(pedidos);
     }

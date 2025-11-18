@@ -53,7 +53,9 @@ public class PedidoMapperTest {
                 .build();
         pedidoResponseDto = PedidoResponseDto.builder()
                 .id(1L)
-                .userId("2")
+                .userId(2L)
+                .carritoId(1L)
+                .direccionEnvio("Calle Falsa 123")
                 .estado(EstadoPedido.ENVIADO)
                 .createdAt(LocalDateTime.now())
                 .total(100.0)
@@ -62,9 +64,8 @@ public class PedidoMapperTest {
                 .detalles(List.of(detallePedidoDto))
                 .build();
         pedidoRequestDto = PedidoRequestDto.builder()
-                .userId("2")
-                .total(100.0)
-                .detalles(List.of(detallePedidoDto))
+                .carritoId(1L)
+                .direccionEnvio("Calle Falsa 123")
                 .build();
     }
 
@@ -73,20 +74,22 @@ public class PedidoMapperTest {
     class ToPedidoTests{
 
         @Test
-        @DisplayName("Convierte de PedidoRequestDto a la entidad Pedido")
+        @DisplayName("Convierte parámetros individuales a la entidad Pedido")
         void toPedido_ok(){
-            PedidoRequestDto pedidoRequestDto = PedidoRequestDto.builder()
-                    .userId("2")
-                    .total(100.0)
-                    .detalles(List.of(detallePedidoDto))
-                    .build();
+            Long userId = 2L;
+            Long carritoId = 1L;
+            String direccionEnvio = "Calle Falsa 123";
+            Double total = 100.0;
+            List<DetallePedido> detalles = List.of(detalle);
 
-            Pedido pedido = pedidoMappers.toPedido(pedidoRequestDto);
+            Pedido pedido = pedidoMappers.toPedido(userId, carritoId, direccionEnvio, total, detalles);
 
             assertAll(
-                    () -> assertEquals(pedidoRequestDto.getUserId(), pedido.getUserId()),
-                    () -> assertEquals(pedidoRequestDto.getTotal(), pedido.getTotal()),
-                    () -> assertEquals(detallePedidoDto.getProductoId(), detalle.getProductoId())
+                    () -> assertEquals(userId, pedido.getUserId()),
+                    () -> assertEquals(carritoId, pedido.getCarritoId()),
+                    () -> assertEquals(direccionEnvio, pedido.getDireccionEnvio()),
+                    () -> assertEquals(total, pedido.getTotal()),
+                    () -> assertEquals(1, pedido.getDetalles().size())
             );
         }
     }
@@ -100,7 +103,9 @@ public class PedidoMapperTest {
         void toResponseDto_ok(){
             Pedido pedido = Pedido.builder()
                     .id(1L)
-                    .userId("2")
+                    .userId(2L)
+                    .carritoId(1L)
+                    .direccionEnvio("Calle Falsa 123")
                     .estado(EstadoPedido.PAGADO)
                     .createdAt(LocalDateTime.now())
                     .total(100.0)
@@ -114,6 +119,8 @@ public class PedidoMapperTest {
             assertAll(
                     () -> assertEquals(pedido.getId(), pedidoResponseDto.getId()),
                     () -> assertEquals(pedido.getUserId(), pedidoResponseDto.getUserId()),
+                    () -> assertEquals(pedido.getCarritoId(), pedidoResponseDto.getCarritoId()),
+                    () -> assertEquals(pedido.getDireccionEnvio(), pedidoResponseDto.getDireccionEnvio()),
                     () -> assertEquals(pedido.getEstado(), pedidoResponseDto.getEstado()),
                     () -> assertEquals(pedido.getCreatedAt(), pedidoResponseDto.getCreatedAt()),
                     () -> assertEquals(pedido.getTotal(), pedidoResponseDto.getTotal()),
@@ -192,7 +199,9 @@ public class PedidoMapperTest {
         void toResponseList_ok(){
             Pedido pedido = Pedido.builder()
                     .id(1L)
-                    .userId("2")
+                    .userId(2L)
+                    .carritoId(1L)
+                    .direccionEnvio("Calle Falsa 123")
                     .estado(EstadoPedido.ENVIADO)
                     .total(100.0)
                     .detalles(List.of(detalle))
@@ -204,7 +213,9 @@ public class PedidoMapperTest {
             assertAll(
                     () -> assertEquals(1, resultado.size()),
                     () -> assertEquals(1L, resultado.get(0).getId()),
-                    () -> assertEquals("2", resultado.get(0).getUserId()),
+                    () -> assertEquals(2L, resultado.get(0).getUserId()),
+                    () -> assertEquals(1L, resultado.get(0).getCarritoId()),
+                    () -> assertEquals("Calle Falsa 123", resultado.get(0).getDireccionEnvio()),
                     () -> assertEquals(EstadoPedido.ENVIADO, resultado.get(0).getEstado()),
                     () -> assertEquals(1, resultado.get(0).getDetalles().size()),
                     () -> assertEquals("10L", resultado.get(0).getDetalles().get(0).getProductoId())

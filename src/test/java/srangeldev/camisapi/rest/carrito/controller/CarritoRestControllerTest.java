@@ -49,7 +49,6 @@ class CarritoRestControllerTest {
             .build();
 
     private final CarritoUpdateRequestDto carritoUpdateRequest = CarritoUpdateRequestDto.builder()
-            .id(1L)
             .productosIds(new ArrayList<>())
             .accion("REEMPLAZAR")
             .productoId("asdasdasdads")

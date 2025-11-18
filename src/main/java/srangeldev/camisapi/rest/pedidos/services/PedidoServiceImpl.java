@@ -3,17 +3,24 @@ package srangeldev.camisapi.rest.pedidos.services;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import srangeldev.camisapi.rest.carrito.models.Carrito;
+import srangeldev.camisapi.rest.carrito.repository.CarritoRepository;
+import srangeldev.camisapi.rest.carrito.Exceptions.CarritoNotFound;
 import srangeldev.camisapi.rest.pedidos.dto.PedidoRequestDto;
 import srangeldev.camisapi.rest.pedidos.dto.PedidoResponseDto;
 import srangeldev.camisapi.rest.pedidos.exceptions.PedidoConflictException;
 import srangeldev.camisapi.rest.pedidos.exceptions.PedidoNotFoundException;
+import srangeldev.camisapi.rest.pedidos.exceptions.PedidoBadRequestException;
 import srangeldev.camisapi.rest.pedidos.mappers.PedidoMappers;
+import srangeldev.camisapi.rest.pedidos.models.DetallePedido;
 import srangeldev.camisapi.rest.pedidos.models.EstadoPedido;
 import srangeldev.camisapi.rest.pedidos.models.Pedido;
 import srangeldev.camisapi.rest.pedidos.repository.PedidoRepository;
-import srangeldev.camisapi.rest.productos.models.EstadoProducto;
+import srangeldev.camisapi.rest.productos.models.Producto;
+import srangeldev.camisapi.rest.productos.repository.ProductoRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,20 +35,70 @@ public class PedidoServiceImpl implements PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final PedidoMappers pedidoMapper;
+    private final CarritoRepository carritoRepository;
+    private final ProductoRepository productoRepository;
 
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, PedidoMappers pedidoMapper) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, PedidoMappers pedidoMapper, 
+                             CarritoRepository carritoRepository, ProductoRepository productoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.pedidoMapper = pedidoMapper;
+        this.carritoRepository = carritoRepository;
+        this.productoRepository = productoRepository;
     }
 
-    // Creamos un nuevo pedido con estado PENDIENTE_PAGO
+    // Creamos un nuevo pedido a partir de un carrito
     @Override
-    @Transactional //Asi si algo falla se revierte tod
+    @Transactional //Así si algo falla se revierte todo
     public PedidoResponseDto crearPedido(PedidoRequestDto pedidoRequest) {
-        Pedido pedido = pedidoMapper.toPedido(pedidoRequest);
+        // 1. Obtener el carrito
+        Carrito carrito = carritoRepository.findById(pedidoRequest.getCarritoId())
+                .orElseThrow(() -> new CarritoNotFound(pedidoRequest.getCarritoId()));
+        
+        // 2. Validar que el carrito tenga productos
+        if (carrito.getProductosIds() == null || carrito.getProductosIds().isEmpty()) {
+            throw new PedidoBadRequestException("El carrito está vacío");
+        }
+        
+        // 3. Obtener los productos del carrito y crear detalles
+        List<DetallePedido> detalles = new ArrayList<>();
+        double total = 0.0;
+        
+        for (String productoId : carrito.getProductosIds()) {
+            Producto producto = productoRepository.findById(productoId)
+                    .orElseThrow(() -> new PedidoBadRequestException("Producto no encontrado: " + productoId));
+            
+            // Crear detalle del pedido con snapshot del producto
+            DetallePedido detalle = DetallePedido.builder()
+                    .productoId(producto.getId())
+                    .nombre(producto.getNombre())
+                    .talla(producto.getTalla())
+                    .equipo(producto.getEquipo())
+                    .precioPagado(producto.getPrecio())
+                    .imageUrl(producto.getImageUrl())
+                    .build();
+            
+            detalles.add(detalle);
+            total += producto.getPrecio();
+        }
+        
+        // 4. Crear el pedido
+        Pedido pedido = pedidoMapper.toPedido(
+                carrito.getUserId(),
+                carrito.getId(),
+                pedidoRequest.getDireccionEnvio(),
+                total,
+                detalles
+        );
         pedido.setEstado(EstadoPedido.PENDIENTE_PAGO);
         pedido.setCreatedAt(LocalDateTime.now());
+        
+        // 5. Guardar el pedido
         Pedido saved = pedidoRepository.save(pedido);
+        
+        // 6. Vaciar el carrito después de crear el pedido
+        carrito.getProductosIds().clear();
+        carritoRepository.save(carrito);
+        
         return pedidoMapper.toResponseDto(saved);
     }
 
@@ -53,7 +110,8 @@ public class PedidoServiceImpl implements PedidoService {
 
     // Obtiene los pedidos del usuario específico
     @Override
-    public List<PedidoResponseDto> findByUsuario(String userId) {
+    @Transactional(readOnly = true)
+    public List<PedidoResponseDto> findByUsuario(Long userId) {
         List<Pedido> pedidos = pedidoRepository.findByUserId(userId);
         return pedidoMapper.toResponseList(pedidos);
     }

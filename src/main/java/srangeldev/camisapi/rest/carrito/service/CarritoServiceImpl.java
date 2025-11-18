@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import srangeldev.camisapi.rest.carrito.Exceptions.CarritoBadId;
 import srangeldev.camisapi.rest.carrito.Exceptions.CarritoException;
 import srangeldev.camisapi.rest.carrito.Exceptions.CarritoNotFound;
@@ -34,12 +35,14 @@ public class CarritoServiceImpl implements CarritoService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CarritoResponseDto> getAll() {
         logger.info("Obteniendo todas las carritos");
         return carritoRepository.findAll().stream().map(carritoMapper::toResponseDto).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CarritoResponseDto getById(Long id) {
         logger.info("Buscando carrito por id: " + id);
         Carrito carrito = carritoRepository.findById(id).orElseThrow(
@@ -50,6 +53,7 @@ public class CarritoServiceImpl implements CarritoService{
     }
 
     @Override
+    @Transactional
     public CarritoResponseDto save(CarritoCreateRequestDto carrito) {
         logger.info("=== INICIO SAVE Carrito ===");
         logger.info("Guardando carrito: {}", carrito);
@@ -86,15 +90,11 @@ public class CarritoServiceImpl implements CarritoService{
     }
 
     @Override
+    @Transactional
     public CarritoResponseDto update(Long id, CarritoUpdateRequestDto carrito) {
         logger.info("Actualizando Carrito con id: " + id);
 
-        Optional<Carrito> existenteConId = carritoRepository.findById(carrito.getId());
-        if (existenteConId.isPresent() && !existenteConId.get().getId().equals(id)) {
-            throw new CarritoException("El carrito con este usuario ya existe") {
-            };
-        }
-
+        // Buscar el carrito existente por ID
         Carrito actualizado = carritoRepository.findById(id).orElseThrow(
                 () -> new CarritoNotFound(id)
         );
@@ -102,10 +102,13 @@ public class CarritoServiceImpl implements CarritoService{
         // Usar el mapper para actualizar la entidad
         carritoMapper.updateFromDto(actualizado, carrito);
         actualizado.setModificadoEn(LocalDateTime.now());
+        
+        logger.info("Carrito actualizado: {}", actualizado);
         return carritoMapper.toResponseDto(carritoRepository.save(actualizado));
     }
 
     @Override
+    @Transactional
     public CarritoResponseDto delete(Long id) {
         logger.info("Eliminando carrito con id: " + id);
         Carrito borrada = carritoRepository.findById(id).orElseThrow(
@@ -117,6 +120,7 @@ public class CarritoServiceImpl implements CarritoService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CarritoResponseDto findByUserId(Long userId) {
         logger.info("Buscando carrito por user id: " + userId);
         Carrito carrito = carritoRepository.findByUserId(userId).orElseThrow(

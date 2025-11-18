@@ -1003,71 +1003,7 @@ GET /api/pedidos/usuario/{userId}
 
 ---
 
-## 📋 7. Colección de Postman
-
-### Crear Variables de Colección
-
-1. En Postman, crea una nueva colección: **"CamisAPI"**
-2. Click derecho → **Edit**
-3. Pestaña **Variables**
-4. Añade estas variables:
-
-| Variable | Initial Value | Current Value |
-|----------|--------------|---------------|
-| `base_url` | `http://localhost:8081` | `http://localhost:8081` |
-| `jwt_token` | (dejar vacío) | (dejar vacío) |
-| `user_id` | `2` | `2` |
-| `producto_id_1` | (dejar vacío) | (dejar vacío) |
-| `producto_id_2` | (dejar vacío) | (dejar vacío) |
-| `carrito_id` | (dejar vacío) | (dejar vacío) |
-| `pedido_id` | (dejar vacío) | (dejar vacío) |
-
-### Scripts Automáticos
-
-#### En POST /auth/login (Tests tab)
-```javascript
-if (pm.response.code === 200) {
-    var jsonData = pm.response.json();
-    pm.collectionVariables.set("jwt_token", jsonData.token);
-    console.log("✅ Token guardado");
-}
-```
-
-#### En POST /api/productos (Tests tab)
-```javascript
-if (pm.response.code === 201) {
-    var jsonData = pm.response.json();
-    if (!pm.collectionVariables.get("producto_id_1")) {
-        pm.collectionVariables.set("producto_id_1", jsonData.id);
-        console.log("✅ Producto 1 guardado:", jsonData.id);
-    } else if (!pm.collectionVariables.get("producto_id_2")) {
-        pm.collectionVariables.set("producto_id_2", jsonData.id);
-        console.log("✅ Producto 2 guardado:", jsonData.id);
-    }
-}
-```
-
-#### En POST /api/carritos (Tests tab)
-```javascript
-if (pm.response.code === 201) {
-    var jsonData = pm.response.json();
-    pm.collectionVariables.set("carrito_id", jsonData.id);
-    console.log("✅ Carrito guardado:", jsonData.id);
-}
-```
-
-#### En POST /api/pedidos (Tests tab)
-```javascript
-if (pm.response.code === 201) {
-    var jsonData = pm.response.json();
-    pm.collectionVariables.set("pedido_id", jsonData.id);
-    console.log("✅ Pedido guardado:", jsonData.id);
-}
-```
-
----
-
-## 🧪 8. Casos de Prueba Importantes
+## 🧪 7. Casos de Prueba Importantes
 
 ### ✅ Caso 1: Producto No Disponible
 ```
@@ -1110,7 +1046,7 @@ if (pm.response.code === 201) {
 
 ---
 
-## 📊 9. Resumen de Endpoints
+## 📊 8. Resumen de Endpoints
 
 ### Autenticación
 | Método | Endpoint | Autenticación | Descripción |

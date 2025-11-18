@@ -38,7 +38,6 @@ class CarritoMapperTest {
             .build();
 
     private final CarritoUpdateRequestDto updateDto = CarritoUpdateRequestDto.builder()
-            .id(1L)
             .productosIds(new ArrayList<>())
             .accion("REEMPLAZAR")
             .productoId("1")
@@ -125,7 +124,6 @@ class CarritoMapperTest {
         @DisplayName("Debe actualizar entidad con acción REEMPLAZAR")
         void debeActualizarConAccionReemplazar() {
             CarritoUpdateRequestDto dtoReemplazar = CarritoUpdateRequestDto.builder()
-                    .id(1L)
                     .productosIds(new ArrayList<>())
                     .accion("REEMPLAZAR")
                     .productoId("1")
@@ -144,7 +142,6 @@ class CarritoMapperTest {
         @DisplayName("Debe actualizar entidad con acción LIMPIAR")
         void debeActualizarConAccionLimpiar() {
             CarritoUpdateRequestDto dtoLimpiar = CarritoUpdateRequestDto.builder()
-                    .id(1L)
                     .productosIds(new ArrayList<>())
                     .accion("LIMPIAR")
                     .productoId("1")
@@ -163,7 +160,6 @@ class CarritoMapperTest {
         @DisplayName("Debe actualizar entidad con acción AGREGAR")
         void debeActualizarConAccionAgregar() {
             CarritoUpdateRequestDto dtoAgregar = CarritoUpdateRequestDto.builder()
-                    .id(1L)
                     .productosIds(new ArrayList<>())
                     .accion("AGREGAR")
                     .productoId("1")
@@ -182,7 +178,6 @@ class CarritoMapperTest {
         @DisplayName("Debe actualizar entidad con acción QUITAR")
         void debeActualizarConAccionQuitar() {
             CarritoUpdateRequestDto dtoQuitar = CarritoUpdateRequestDto.builder()
-                    .id(1L)
                     .productosIds(new ArrayList<>())
                     .accion("QUITAR")
                     .productoId("1")
@@ -201,7 +196,6 @@ class CarritoMapperTest {
         @DisplayName("Debe manejar acción null como REEMPLAZAR")
         void debeManejadorAccionNull() {
             CarritoUpdateRequestDto dtoSinAccion = CarritoUpdateRequestDto.builder()
-                    .id(1L)
                     .productosIds(new ArrayList<>())
                     .accion(null)
                     .productoId("1")

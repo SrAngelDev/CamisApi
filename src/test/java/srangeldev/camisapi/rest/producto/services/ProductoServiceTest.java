@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.socket.WebSocketHandler;
 import srangeldev.camisapi.rest.productos.dto.ProductoRequestDTO;
 import srangeldev.camisapi.rest.productos.dto.ProductoResponseDTO;
 import srangeldev.camisapi.rest.productos.mapper.ProductoMapper;
@@ -17,6 +16,7 @@ import srangeldev.camisapi.rest.productos.models.Producto;
 import srangeldev.camisapi.rest.productos.repository.ProductoRepository;
 import srangeldev.camisapi.rest.productos.exceptions.ProductoNotFound;
 import srangeldev.camisapi.rest.productos.service.ProductoService;
+import srangeldev.camisapi.websocket.config.MyWebSocketHandler;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,7 +35,7 @@ class ProductoServiceTest {
     private ProductoMapper productoMapper;
 
     @Mock
-    private srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler;
+    private MyWebSocketHandler myWebSocketHandler;
 
     @InjectMocks
     private ProductoService productoService;
@@ -100,7 +100,7 @@ class ProductoServiceTest {
             assertAll(
                     () -> assertEquals(responseDTO.getNombre(), resultado.getNombre()),
                     () -> verify(productoRepository, times(1)).save(producto),
-                    () -> verify(webSocketHandler, times(1))
+                    () -> verify(myWebSocketHandler, times(1))
                             .enviarMensajeATodos("Producto creado:" + producto.getNombre())
             );
         }
@@ -124,7 +124,7 @@ class ProductoServiceTest {
             assertAll(
                     () -> assertEquals(1, resultados.size()),
                     () -> assertEquals("Camiseta Real Madrid", resultados.get(0).getNombre()),
-                    () -> verify(webSocketHandler, times(1))
+                    () -> verify(myWebSocketHandler, times(1))
                             .enviarMensajeATodos("Productos listados correctamente")
             );
         }
@@ -147,7 +147,7 @@ class ProductoServiceTest {
 
             assertAll(
                     () -> assertEquals("Camiseta Real Madrid", resultado.getNombre()),
-                    () -> verify(webSocketHandler, times(1))
+                    () -> verify(myWebSocketHandler, times(1))
                             .enviarMensajeATodos("Producto obtenido con id:1")
             );
         }
@@ -158,7 +158,7 @@ class ProductoServiceTest {
             when(productoRepository.findById("2")).thenReturn(Optional.empty());
 
             assertThrows(ProductoNotFound.class, () -> productoService.obtenerPorId("2"));
-            verify(webSocketHandler, never()).enviarMensajeATodos(anyString());
+            verify(myWebSocketHandler, never()).enviarMensajeATodos(anyString());
         }
     }
 
@@ -181,7 +181,7 @@ class ProductoServiceTest {
             assertAll(
                     () -> assertEquals("Camiseta Real Madrid", resultado.getNombre()),
                     () -> verify(productoRepository, times(1)).save(producto),
-                    () -> verify(webSocketHandler, times(1))
+                    () -> verify(myWebSocketHandler, times(1))
                             .enviarMensajeATodos("Producto actualizado con id:1")
             );
         }
@@ -192,7 +192,7 @@ class ProductoServiceTest {
             when(productoRepository.findById("2")).thenReturn(Optional.empty());
 
             assertThrows(ProductoNotFound.class, () -> productoService.actualizarProducto("2", requestDTO));
-            verify(webSocketHandler, never()).enviarMensajeATodos(anyString());
+            verify(myWebSocketHandler, never()).enviarMensajeATodos(anyString());
         }
     }
 
@@ -212,7 +212,7 @@ class ProductoServiceTest {
 
             verify(productoRepository, times(1)).findById("1");
             verify(productoRepository, times(1)).deleteById("1");
-            verify(webSocketHandler, times(1))
+            verify(myWebSocketHandler, times(1))
                     .enviarMensajeATodos("Producto eliminado con id1");
         }
 

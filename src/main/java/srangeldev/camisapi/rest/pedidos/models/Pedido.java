@@ -45,8 +45,23 @@ public class Pedido {
      * Se almacena el ID del User (String - ObjectId de MongoDB)
      */
     @NotNull(message = "El usuario no puede ser nulo")
-    @Column(name = "user_id", nullable = false, length = 24)
-    private String  userId;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+    
+    /**
+     * ID del carrito desde el cual se creó el pedido
+     * Mantiene trazabilidad del origen del pedido
+     */
+    @NotNull(message = "El carrito no puede ser nulo")
+    @Column(name = "carrito_id", nullable = false)
+    private Long carritoId;
+    
+    /**
+     * Dirección de envío del pedido
+     */
+    @NotNull(message = "La dirección de envío no puede ser nula")
+    @Column(name = "direccion_envio", nullable = false, length = 500)
+    private String direccionEnvio;
     
     /**
      * Estado actual del pedido

@@ -1,0 +1,24 @@
+# Build stage - genera los reportes
+FROM gradle:9.1.0-jdk25-alpine AS build
+WORKDIR /app
+COPY build.gradle.kts settings.gradle.kts ./
+COPY gradle ./gradle
+COPY src ./src
+
+RUN gradle clean --no-daemon
+RUN gradle build jacocoTestReport jacocoTestCoverageVerification :dokkaGeneratePublicationHtml --no-daemon --no-build-cache
+
+# Test Reports Server
+FROM httpd:alpine AS test-server
+COPY --from=build /app/build/reports/tests/test /usr/local/apache2/htdocs/
+RUN chmod -R 755 /usr/local/apache2/htdocs
+
+# Documentation Server
+FROM nginx:alpine AS doc-server
+COPY --from=build /app/build/docs/dokka /usr/share/nginx/html/
+RUN chmod -R 755 /usr/share/nginx/html
+
+# Coverage Server
+FROM nginx:alpine AS coverage-server
+COPY --from=build /app/build/reports/jacoco /usr/share/nginx/html/
+RUN chmod -R 755 /usr/share/nginx/html

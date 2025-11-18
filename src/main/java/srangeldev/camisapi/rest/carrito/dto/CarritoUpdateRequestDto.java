@@ -20,12 +20,6 @@ import java.util.List;
 public class CarritoUpdateRequestDto {
 
     /**
-     * ID del carrito a actualizar
-     */
-    @NotNull(message = "El ID del carrito no puede ser nulo")
-    private Long id;
-
-    /**
      * Lista actualizada de IDs de productos (referencias a MongoDB)
      */
     private List<@NotEmpty(message = "El ID del producto no puede estar vacío") String> productosIds;

@@ -80,7 +80,6 @@ class UserControllerTest {
                 .build();
 
         userCreateRequestDto = UserCreateRequestDto.builder()
-                .idUsuario(2L)
                 .nombre("New User")
                 .username("newuser")
                 .password("password123")

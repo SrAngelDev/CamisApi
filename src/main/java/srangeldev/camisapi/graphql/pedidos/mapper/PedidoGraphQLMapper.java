@@ -12,7 +12,7 @@ public class PedidoGraphQLMapper {
 
     public PedidoGraphQLResponse toGraphQLResponse(PedidoResponseDto dto) {
         return PedidoGraphQLResponse.builder()
-                .id(dto.getId() != null ? dto.getId().toString() : null)
+                .id(dto.getId() != null ? dto.getId(): null)
                 .usuario(dto.getUserId())
                 .fechaPedido(dto.getCreatedAt() != null ? dto.getCreatedAt().toString() : null)
                 .total(dto.getTotal())

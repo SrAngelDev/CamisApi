@@ -1,5 +1,6 @@
 package srangeldev.camisapi.rest.users.repositories;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,10 +18,18 @@ import java.util.Optional;
  * MongoRepository proporciona métodos básicos CRUD y permite definir queries personalizadas
  * usando @Query con sintaxis de MongoDB o mediante la nomenclatura de Spring Data.
  * 
- * Ahora usa Long (idUsuario) como tipo de ID principal.
+ * Usa ObjectId como tipo de ID principal (el _id de MongoDB) pero permite buscar por idUsuario.
  */
 @Repository
-public interface UserRepository extends MongoRepository<User, Long> {
+public interface UserRepository extends MongoRepository<User, ObjectId> {
+
+    /**
+     * Busca un usuario por su ID de negocio (idUsuario)
+     *
+     * @param idUsuario ID del usuario
+     * @return Optional con el usuario si se encuentra
+     */
+    Optional<User> findByIdUsuario(Long idUsuario);
 
     /**
      * Busca un usuario por su nombre de usuario (username)
@@ -70,4 +79,12 @@ public interface UserRepository extends MongoRepository<User, Long> {
      */
     @Query("{'username': {$regex: ?0, $options: 'i'}, 'isDeleted': ?1}")
     List<User> findByUsernameContainingIgnoreCaseAndIsDeleted(String username, Boolean isDeleted);
+
+    /**
+     * Obtiene el usuario con el mayor idUsuario.
+     * Se usa para generar el siguiente ID auto-incremental.
+     *
+     * @return Optional con el usuario con mayor idUsuario
+     */
+    Optional<User> findFirstByOrderByIdUsuarioDesc();
 }

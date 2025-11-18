@@ -37,6 +37,10 @@ import static org.mockito.Mockito.*;
     private PedidoRepository pedidoRepository;
     @Mock
     private PedidoMappers pedidoMappers;
+    @Mock
+    private srangeldev.camisapi.rest.carrito.repository.CarritoRepository carritoRepository;
+    @Mock
+    private srangeldev.camisapi.rest.productos.repository.ProductoRepository productoRepository;
 
     @InjectMocks
     private PedidoServiceImpl pedidoService;
@@ -60,7 +64,9 @@ import static org.mockito.Mockito.*;
 
         pedido = Pedido.builder()
                 .id(1L)
-                .userId("2")
+                .userId(2L)
+                .carritoId(1L)
+                .direccionEnvio("Calle Falsa 123")
                 .estado(EstadoPedido.PENDIENTE_PAGO)
                 .createdAt(LocalDateTime.now())
                 .total(100.0)
@@ -78,7 +84,9 @@ import static org.mockito.Mockito.*;
                 .build();
         pedidoResponseDto = PedidoResponseDto.builder()
                 .id(1L)
-                .userId("2")
+                .userId(2L)
+                .carritoId(1L)
+                .direccionEnvio("Calle Falsa 123")
                 .estado(EstadoPedido.PENDIENTE_PAGO)
                 .createdAt(LocalDateTime.now())
                 .total(100.0)
@@ -87,9 +95,8 @@ import static org.mockito.Mockito.*;
                 .detalles(List.of(detallePedidoDto))
                 .build();
         pedidoRequestDto = PedidoRequestDto.builder()
-                .userId("2")
-                .total(100.0)
-                .detalles(List.of(detallePedidoDto))
+                .carritoId(1L)
+                .direccionEnvio("Calle Falsa 123")
                 .build();
     }
     @Nested
@@ -97,19 +104,41 @@ import static org.mockito.Mockito.*;
     class CrearPedidoTest {
 
         @Test
-        @DisplayName("Crear Pedido")
+        @DisplayName("Crear Pedido desde un carrito")
         void crearPedido_ok(){
-            when(pedidoMappers.toPedido(pedidoRequestDto)).thenReturn(pedido);
-            when(pedidoRepository.save(pedido)).thenReturn(pedido);
+            // Crear carrito mock
+            srangeldev.camisapi.rest.carrito.models.Carrito carrito = srangeldev.camisapi.rest.carrito.models.Carrito.builder()
+                    .id(1L)
+                    .userId(2L)
+                    .productosIds(new java.util.ArrayList<>(List.of("10L")))
+                    .build();
+            
+            // Crear producto mock
+            srangeldev.camisapi.rest.productos.models.Producto producto = srangeldev.camisapi.rest.productos.models.Producto.builder()
+                    .id("10L")
+                    .nombre("Vinicius Jr")
+                    .talla("XL")
+                    .equipo("Real Madrid")
+                    .precio(100.0)
+                    .imageUrl("/camisetaDeFutbol.png")
+                    .build();
+            
+            when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
+            when(productoRepository.findById("10L")).thenReturn(Optional.of(producto));
+            when(pedidoMappers.toPedido(anyLong(), anyLong(), anyString(), anyDouble(), anyList())).thenReturn(pedido);
+            when(pedidoRepository.save(any())).thenReturn(pedido);
             when(pedidoMappers.toResponseDto(pedido)).thenReturn(pedidoResponseDto);
+            when(carritoRepository.save(any())).thenReturn(carrito);
 
             PedidoResponseDto resultado = pedidoService.crearPedido(pedidoRequestDto);
 
             assertAll(
                     () -> assertEquals(EstadoPedido.PENDIENTE_PAGO, resultado.getEstado()),
                     () -> assertEquals(pedidoResponseDto.getDetalles(), resultado.getDetalles()),
-                    () -> verify(pedidoRepository, times(1)).save(pedido),
-                    () -> verify(pedidoMappers, times(1)).toPedido(pedidoRequestDto),
+                    () -> verify(carritoRepository, times(1)).findById(1L),
+                    () -> verify(productoRepository, times(1)).findById("10L"),
+                    () -> verify(pedidoRepository, times(1)).save(any()),
+                    () -> verify(carritoRepository, times(1)).save(carrito), // Verifica que el carrito se vació
                     () -> verify(pedidoMappers, times(1)).toResponseDto(pedido)
             );
         }
@@ -141,11 +170,11 @@ import static org.mockito.Mockito.*;
         @Test
         @DisplayName("Deveria devolver todos los pedidos por usuario")
         void findByUsuario_ok(){
-            when(pedidoRepository.findByUserId("2")).thenReturn(List.of(pedido));
+            when(pedidoRepository.findByUserId(2L)).thenReturn(List.of(pedido));
             when(pedidoMappers.toResponseList(List.of(pedido))).thenReturn(List.of(pedidoResponseDto));
 
 
-            List<PedidoResponseDto> resultados = pedidoService.findByUsuario("2");
+            List<PedidoResponseDto> resultados = pedidoService.findByUsuario(2L);
             assertEquals(1, resultados.size());
         }
     }
@@ -186,7 +215,9 @@ import static org.mockito.Mockito.*;
             // Crear un DTO con el estado actualizado a PAGADO
             PedidoResponseDto pedidoActualizadoDto = PedidoResponseDto.builder()
                     .id(1L)
-                    .userId("2")
+                    .userId(2L)
+                    .carritoId(1L)
+                    .direccionEnvio("Calle Falsa 123")
                     .estado(EstadoPedido.PAGADO)
                     .createdAt(pedidoResponseDto.getCreatedAt())
                     .total(100.0)

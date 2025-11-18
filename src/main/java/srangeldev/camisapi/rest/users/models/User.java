@@ -1,5 +1,6 @@
 package srangeldev.camisapi.rest.users.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -11,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,14 +41,16 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
     /**
      * Identificador interno de MongoDB (ObjectId)
-     * Se mantiene para compatibilidad con MongoDB
+     * MongoDB lo genera automáticamente
      */
+    @Id
+    @JsonIgnore
     private ObjectId _id;
 
     /**
      * Identificador único del usuario (clave primaria de negocio)
      */
-    @Id
+    @Field("id_usuario")
     @NotNull(message = "El id del usuario no puede ser nulo")
     private Long idUsuario;
 
@@ -61,6 +65,7 @@ public class User implements UserDetails {
 
     @NotBlank(message = "La contraseña no puede estar vacía")
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    @JsonIgnore
     private String password;
 
     private Set<Rol> roles;
@@ -72,9 +77,11 @@ public class User implements UserDetails {
     private LocalDateTime updatedAt = LocalDateTime.now();
     
     @Builder.Default
+    @JsonIgnore
     private Boolean isDeleted = false;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
@@ -82,21 +89,25 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return !isDeleted;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return !isDeleted;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return !isDeleted;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return !isDeleted;
     }

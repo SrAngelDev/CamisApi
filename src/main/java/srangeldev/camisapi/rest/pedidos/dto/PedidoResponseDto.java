@@ -23,7 +23,9 @@ import java.util.List;
 public class PedidoResponseDto {
 
     private Long id;
-    private String userId;
+    private Long userId;
+    private Long carritoId;
+    private String direccionEnvio;
     private EstadoPedido estado;
     private LocalDateTime createdAt;
     private Double total;

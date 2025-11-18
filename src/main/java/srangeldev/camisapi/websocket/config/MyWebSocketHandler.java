@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class WebSocketHandler extends TextWebSocketHandler {
+public class MyWebSocketHandler extends TextWebSocketHandler {
 
     private final Set<WebSocketSession> sessions = Collections.synchronizedSet(new HashSet<>());
     private final ObjectMapper objectMapper = new ObjectMapper();

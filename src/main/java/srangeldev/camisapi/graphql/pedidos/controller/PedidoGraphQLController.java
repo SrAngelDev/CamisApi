@@ -37,7 +37,7 @@ public class PedidoGraphQLController {
     }
 
     @QueryMapping
-    public List<PedidoGraphQLResponse> pedidosPorUsuario(@Argument String usuario) {
+    public List<PedidoGraphQLResponse> pedidosPorUsuario(@Argument Long usuario) {
         var pedidos = pedidoService.findByUsuario(usuario);
         return mapper.toGraphQLResponseList(pedidos);
     }

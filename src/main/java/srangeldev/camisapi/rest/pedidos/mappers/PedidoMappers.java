@@ -14,18 +14,23 @@ import java.util.stream.Collectors;
 public class PedidoMappers {
 
     /**
-     * Convertimos el PedidoRequestDto recibido a la entidad Pedido.
+     * Crea una entidad Pedido a partir de los datos básicos
+     * Los detalles se agregan posteriormente desde el servicio
      *
-     * @param dto el objeto con los datos del pedido provenientes de la solicitud.
-     * @return una instancia de Pedido con los valores correspondientes.
+     * @param userId ID del usuario
+     * @param carritoId ID del carrito
+     * @param direccionEnvio Dirección de envío
+     * @param total Total calculado
+     * @param detalles Lista de detalles del pedido
+     * @return una instancia de Pedido
      */
-    public Pedido toPedido(PedidoRequestDto dto) {
+    public Pedido toPedido(Long userId, Long carritoId, String direccionEnvio, Double total, List<DetallePedido> detalles) {
         return Pedido.builder()
-                .userId(dto.getUserId())
-                .total(dto.getTotal())
-                .detalles(dto.getDetalles().stream()
-                        .map(this::toDetallePedido)
-                        .collect(Collectors.toList()))
+                .userId(userId)
+                .carritoId(carritoId)
+                .direccionEnvio(direccionEnvio)
+                .total(total)
+                .detalles(detalles)
                 .build();
     }
 
@@ -40,6 +45,8 @@ public class PedidoMappers {
         return new PedidoResponseDto(
                 pedido.getId(),
                 pedido.getUserId(),
+                pedido.getCarritoId(),
+                pedido.getDireccionEnvio(),
                 pedido.getEstado(),
                 pedido.getCreatedAt(),
                 pedido.getTotal(),
@@ -96,6 +103,8 @@ public class PedidoMappers {
                 .map(p -> new PedidoResponseDto(
                         p.getId(),
                         p.getUserId(),
+                        p.getCarritoId(),
+                        p.getDireccionEnvio(),
                         p.getEstado(),
                         p.getCreatedAt(),
                         p.getTotal(),

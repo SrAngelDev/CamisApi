@@ -18,6 +18,7 @@ import srangeldev.camisapi.rest.users.mappers.UserMapper;
 import srangeldev.camisapi.rest.users.models.Rol;
 import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.users.repositories.UserRepository;
+import srangeldev.camisapi.websocket.config.MyWebSocketHandler;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -39,6 +40,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private MyWebSocketHandler myWebSocketHandler;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -75,7 +79,6 @@ class UserServiceImplTest {
                 .build();
 
         userCreateRequestDto = UserCreateRequestDto.builder()
-                .idUsuario(2L)
                 .nombre("New User")
                 .username("newuser")
                 .password("password123")
@@ -140,7 +143,7 @@ class UserServiceImplTest {
         @DisplayName("Debe devolver usuario por ID")
         void findById_ShouldReturnUser() {
             // Arrange
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
             when(userMapper.toUsuarioResponseDto(user)).thenReturn(userResponseDto);
 
             // Act
@@ -150,7 +153,7 @@ class UserServiceImplTest {
             assertAll(
                     () -> assertNotNull(result),
                     () -> assertEquals(userResponseDto, result),
-                    () -> verify(userRepository, times(1)).findById(userId),
+                    () -> verify(userRepository, times(1)).findByIdUsuario(userId),
                     () -> verify(userMapper, times(1)).toUsuarioResponseDto(user)
             );
         }
@@ -159,15 +162,15 @@ class UserServiceImplTest {
         @DisplayName("Debe lanzar UserNotFound si ID no existe")
         void findById_ShouldThrowUserNotFound() {
             // Arrange
-            when(userRepository.findById(userId)).thenReturn(Optional.empty());
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.empty());
 
             // Act & Assert
             var exception = assertThrows(UserNotFound.class, () -> {
                 userService.findById(userId);
             });
 
-            assertEquals("Usuario con username Usuario con id " + userId + " no encontrado no encontrado", exception.getMessage());
-            verify(userRepository, times(1)).findById(userId);
+            assertEquals("Usuario con id " + userId + " no encontrado", exception.getMessage());
+            verify(userRepository, times(1)).findByIdUsuario(userId);
             verify(userMapper, never()).toUsuarioResponseDto(any());
         }
     }
@@ -205,7 +208,6 @@ class UserServiceImplTest {
         void save_ShouldSaveUser() {
             // Arrange
             User userToSave = User.builder() // Simula lo que devuelve el mapper
-                    .idUsuario(userCreateRequestDto.getIdUsuario())
                     .nombre(userCreateRequestDto.getNombre())
                     .username(userCreateRequestDto.getUsername())
                     .password(userCreateRequestDto.getPassword())
@@ -213,7 +215,7 @@ class UserServiceImplTest {
                     .build();
 
             User savedUser = User.builder() // Simula lo que devuelve el repo.save()
-                    .idUsuario(userCreateRequestDto.getIdUsuario())
+                    .idUsuario(1L) // ID generado automáticamente
                     .nombre(userToSave.getNombre())
                     .username(userToSave.getUsername())
                     .password(userToSave.getPassword())
@@ -222,7 +224,7 @@ class UserServiceImplTest {
                     .updatedAt(LocalDateTime.now())
                     .build();
 
-            when(userRepository.findById(userCreateRequestDto.getIdUsuario())).thenReturn(Optional.empty());
+            when(userRepository.findFirstByOrderByIdUsuarioDesc()).thenReturn(Optional.empty()); // No hay usuarios, ID será 1
             when(userRepository.findByUsername(userCreateRequestDto.getUsername())).thenReturn(Optional.empty());
             when(userMapper.toUsuario(userCreateRequestDto)).thenReturn(userToSave);
             when(userRepository.save(any(User.class))).thenReturn(savedUser);
@@ -238,11 +240,13 @@ class UserServiceImplTest {
             assertAll(
                     () -> assertNotNull(result),
                     () -> assertEquals(userResponseDto, result),
-                    () -> verify(userRepository, times(1)).findById(userCreateRequestDto.getIdUsuario()),
+                    () -> verify(userRepository, times(1)).findFirstByOrderByIdUsuarioDesc(),
                     () -> verify(userRepository, times(1)).findByUsername(userCreateRequestDto.getUsername()),
                     () -> verify(userMapper, times(1)).toUsuario(userCreateRequestDto),
                     () -> verify(userRepository, times(1)).save(userCaptor.capture()),
                     () -> verify(userMapper, times(1)).toUsuarioResponseDto(savedUser),
+                    // Verificar que el servicio asignó el ID automáticamente
+                    () -> assertEquals(1L, userCaptor.getValue().getIdUsuario()),
                     // Verificar que el servicio asignó fechas
                     () -> assertNotNull(userCaptor.getValue().getIdUsuario()),
                     () -> assertNotNull(userCaptor.getValue().getCreatedAt()),
@@ -276,7 +280,7 @@ class UserServiceImplTest {
         @DisplayName("Debe actualizar un usuario completamente")
         void update_ShouldUpdateUserFully() {
             // Arrange
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
             when(userRepository.findByUsername(userUpdateRequestDto.getUsername())).thenReturn(Optional.empty());
             when(userRepository.save(any(User.class))).thenReturn(user); // Devuelve el usuario modificado
             when(userMapper.toUsuarioResponseDto(user)).thenReturn(userResponseDto);
@@ -290,7 +294,7 @@ class UserServiceImplTest {
             assertAll(
                     () -> assertNotNull(result),
                     () -> assertEquals(userResponseDto, result),
-                    () -> verify(userRepository, times(1)).findById(userId),
+                    () -> verify(userRepository, times(1)).findByIdUsuario(userId),
                     () -> verify(userRepository, times(1)).findByUsername(userUpdateRequestDto.getUsername()),
                     () -> verify(userRepository, times(1)).save(userCaptor.capture()),
                     () -> verify(userMapper, times(1)).toUsuarioResponseDto(user),
@@ -305,14 +309,14 @@ class UserServiceImplTest {
         @DisplayName("Debe lanzar UserNotFound si el usuario a actualizar no existe")
         void update_ShouldThrowUserNotFound() {
             // Arrange
-            when(userRepository.findById(userId)).thenReturn(Optional.empty());
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.empty());
 
             // Act & Assert
             assertThrows(UserNotFound.class, () -> {
                 userService.update(userId, userUpdateRequestDto);
             });
 
-            verify(userRepository, times(1)).findById(userId);
+            verify(userRepository, times(1)).findByIdUsuario(userId);
             verify(userRepository, never()).findByUsername(anyString());
             verify(userRepository, never()).save(any());
         }
@@ -322,7 +326,7 @@ class UserServiceImplTest {
         void update_ShouldThrowUserBadRequestOnDuplicateUsername() {
             // Arrange
             User existingUserWithSameUsername = User.builder().idUsuario(999L).username("updateduser").build();
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
             when(userRepository.findByUsername(userUpdateRequestDto.getUsername())).thenReturn(Optional.of(existingUserWithSameUsername));
 
             // Act & Assert
@@ -330,7 +334,7 @@ class UserServiceImplTest {
                 userService.update(userId, userUpdateRequestDto);
             });
 
-            verify(userRepository, times(1)).findById(userId);
+            verify(userRepository, times(1)).findByIdUsuario(userId);
             verify(userRepository, times(1)).findByUsername(userUpdateRequestDto.getUsername());
             verify(userRepository, never()).save(any());
         }
@@ -340,14 +344,14 @@ class UserServiceImplTest {
         void update_ShouldSkipUsernameValidationIfNull() {
             // Arrange
             userUpdateRequestDto.setUsername(null);
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
             when(userRepository.save(any(User.class))).thenReturn(user);
 
             // Act
             userService.update(userId, userUpdateRequestDto);
 
             // Assert
-            verify(userRepository, times(1)).findById(userId);
+            verify(userRepository, times(1)).findByIdUsuario(userId);
             // No debe llamar a findByUsername si el DTO trae null
             verify(userRepository, never()).findByUsername(anyString());
             verify(userRepository, times(1)).save(user);
@@ -358,7 +362,7 @@ class UserServiceImplTest {
         void update_ShouldSkipUsernameValidationIfEmpty() {
             // Arrange
             userUpdateRequestDto.setUsername("");
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
             when(userRepository.save(any(User.class))).thenReturn(user);
 
             // Act
@@ -374,7 +378,7 @@ class UserServiceImplTest {
         void update_ShouldSkipUsernameValidationIfSame() {
             // Arrange
             userUpdateRequestDto.setUsername(user.getUsername()); // Mismo username
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
             when(userRepository.save(any(User.class))).thenReturn(user);
 
             // Act
@@ -398,7 +402,7 @@ class UserServiceImplTest {
             String originalNombre = user.getNombre();
             Set<Rol> originalRoles = user.getRoles();
 
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
             when(userRepository.save(any(User.class))).thenReturn(user);
 
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -422,29 +426,29 @@ class UserServiceImplTest {
         @DisplayName("Debe eliminar un usuario")
         void deleteById_ShouldDeleteUser() {
             // Arrange
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-            doNothing().when(userRepository).deleteById(userId); // void method
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.of(user));
+            doNothing().when(userRepository).deleteById(user.get_id()); // void method
 
             // Act
             userService.deleteById(userId);
 
             // Assert
-            verify(userRepository, times(1)).findById(userId);
-            verify(userRepository, times(1)).deleteById(userId);
+            verify(userRepository, times(1)).findByIdUsuario(userId);
+            verify(userRepository, times(1)).deleteById(user.get_id());
         }
 
         @Test
         @DisplayName("Debe lanzar UserNotFound si el usuario a eliminar no existe")
         void deleteById_ShouldThrowUserNotFound() {
             // Arrange
-            when(userRepository.findById(userId)).thenReturn(Optional.empty());
+            when(userRepository.findByIdUsuario(userId)).thenReturn(Optional.empty());
 
             // Act & Assert
             assertThrows(UserNotFound.class, () -> {
                 userService.deleteById(userId);
             });
 
-            verify(userRepository, times(1)).findById(userId);
+            verify(userRepository, times(1)).findByIdUsuario(userId);
             verify(userRepository, never()).deleteById(any());
         }
     }

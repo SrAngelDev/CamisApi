@@ -1,6 +1,5 @@
 package srangeldev.camisapi.rest.productos.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -15,26 +14,27 @@ import srangeldev.camisapi.rest.productos.mapper.ProductoMapper;
 import srangeldev.camisapi.rest.productos.models.EstadoProducto;
 import srangeldev.camisapi.rest.productos.models.Producto;
 import srangeldev.camisapi.rest.productos.repository.ProductoRepository;
+import srangeldev.camisapi.websocket.config.MyWebSocketHandler;
 
 
 import java.util.List;
 
 @Slf4j
 @Service
-@CacheConfig (cacheNames = {"productos"})
+@CacheConfig(cacheNames = {"productos"})
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final ProductoMapper productoMapper;
     private final WebSocketHandler productosWebSocketHandler;
-    private final srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler;
+    private final MyWebSocketHandler myWebSocketHandler;
 
     @Autowired
-    public ProductoService(ProductoRepository repository, ProductoMapper mapper, WebSocketHandler productosWebSocketHandler, srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler) {
+    public ProductoService(ProductoRepository repository, ProductoMapper mapper, WebSocketHandler productosWebSocketHandler, MyWebSocketHandler myWebSocketHandler) {
         this.productoRepository = repository;
         this.productoMapper = mapper;
         this.productosWebSocketHandler = productosWebSocketHandler;
-        this.webSocketHandler = webSocketHandler;
+        this.myWebSocketHandler = myWebSocketHandler;
     }
 
     /**
@@ -48,7 +48,7 @@ public class ProductoService {
                 .map(productoMapper::toDTO)
                 .toList();
 
-        webSocketHandler.enviarMensajeATodos("Productos listados correctamente");
+        myWebSocketHandler.enviarMensajeATodos("Productos listados correctamente");
 
         return productos;
     }
@@ -63,7 +63,7 @@ public class ProductoService {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNotFound("No se encontró el producto con ID: " + id));
 
-        webSocketHandler.enviarMensajeATodos("Producto obtenido con id:" +id );
+        myWebSocketHandler.enviarMensajeATodos("Producto obtenido con id:" +id );
         return productoMapper.toDTO(producto);
     }
 
@@ -71,21 +71,21 @@ public class ProductoService {
      * Crea un nuevo producto.
      * Si no se especifica fechaCreacion, se asigna la fecha actual.
      */
-    @CacheEvict(key = "#result.id")
+    @CacheEvict(allEntries = true)
     public ProductoResponseDTO crearProducto(ProductoRequestDTO dto) {
         log.info("Creando el producto: {}", dto.getNombre());
         Producto producto = productoMapper.toEntity(dto);
 
         Producto guardado = productoRepository.save(producto);
 
-        webSocketHandler.enviarMensajeATodos("Producto creado:" +dto.getNombre());
+        myWebSocketHandler.enviarMensajeATodos("Producto creado:" +dto.getNombre());
         return productoMapper.toDTO(guardado);
     }
 
     /**
      * Actualiza un producto existente.
      */
-    @CacheEvict(key = "#id")
+    @CacheEvict(allEntries = true)
     public ProductoResponseDTO actualizarProducto(String id, ProductoRequestDTO dto) {
         log.info("Actualizando el producto con id: {}", id);
         Producto existente = productoRepository.findById(id)
@@ -101,21 +101,21 @@ public class ProductoService {
 
         Producto actualizado = productoRepository.save(existente);
 
-        webSocketHandler.enviarMensajeATodos("Producto actualizado con id:" +id );
+        myWebSocketHandler.enviarMensajeATodos("Producto actualizado con id:" +id );
         return productoMapper.toDTO(actualizado);
     }
 
     /**
      * Elimina un producto por su ID.
      */
-    @CacheEvict(key = "#id")
+    @CacheEvict(allEntries = true)
     public void eliminarProducto(String id) {
         log.info("Eliminando el producto con id: {}", id);
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(()-> new ProductoNotFound("No se encontro el producto con ID: " + id));
 
         productoRepository.deleteById(id);
-        webSocketHandler.enviarMensajeATodos("Producto eliminado con id" +id );
+        myWebSocketHandler.enviarMensajeATodos("Producto eliminado con id" +id );
     }
 
     /**

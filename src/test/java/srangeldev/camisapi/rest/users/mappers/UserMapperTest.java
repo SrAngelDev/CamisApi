@@ -33,7 +33,6 @@ class UserMapperTest {
 
         // DTO para crear
         createDto = UserCreateRequestDto.builder()
-                .idUsuario(userId)
                 .nombre("Test User")
                 .username("testuser")
                 .password("password123")
@@ -64,7 +63,7 @@ class UserMapperTest {
 
             // Assert
             assertAll(
-                    () -> assertEquals(createDto.getIdUsuario(), result.getIdUsuario()),
+                    () -> assertNull(result.getIdUsuario(), "El ID debe ser nulo hasta que el servicio lo asigne"),
                     () -> assertEquals(createDto.getNombre(), result.getNombre()),
                     () -> assertEquals(createDto.getUsername(), result.getUsername()),
                     () -> assertEquals(createDto.getPassword(), result.getPassword()),

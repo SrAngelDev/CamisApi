@@ -64,7 +64,6 @@ class CarritoServiceImplTest {
             .build();
 
     private final CarritoUpdateRequestDto carritoUpdateRequest = CarritoUpdateRequestDto.builder()
-            .id(1L)
             .productosIds(new ArrayList<>())
             .accion("REEMPLAZAR")
             .productoId("1")
@@ -160,7 +159,7 @@ class CarritoServiceImplTest {
             CarritoResponseDto result = carritoService.update(1L, carritoUpdateRequest);
 
             assertEquals(carritoResponse, result);
-            verify(carritoRepository, times(2)).findById(1L);
+            verify(carritoRepository, times(1)).findById(1L);
             verify(carritoMapper).updateFromDto(carrito, carritoUpdateRequest);
             verify(carritoRepository).save(any(Carrito.class));
             verify(carritoMapper).toResponseDto(carrito);
@@ -172,24 +171,28 @@ class CarritoServiceImplTest {
             when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
 
             assertThrows(CarritoNotFound.class, () -> carritoService.update(1L, carritoUpdateRequest));
-            verify(carritoRepository, times(2)).findById(1L);
+            verify(carritoRepository, times(1)).findById(1L);
         }
 
         @Test
-        @DisplayName("Debe lanzar excepción cuando ID ya existe en otro carrito")
-        void testUpdate_IdYaExisteEnOtroCarrito() {
-            CarritoUpdateRequestDto dtoConIdDiferente = CarritoUpdateRequestDto.builder()
-                    .id(2L)
+        @DisplayName("Debe actualizar carrito sin validaciones adicionales de ID")
+        void testUpdate_SinValidacionesAdicionales() {
+            CarritoUpdateRequestDto dtoActualizar = CarritoUpdateRequestDto.builder()
                     .productosIds(new ArrayList<>())
                     .accion("REEMPLAZAR")
                     .productoId("1")
                     .build();
 
-            Carrito otroCarrito = Carrito.builder().id(2L).userId(102L).build();
-            when(carritoRepository.findById(2L)).thenReturn(Optional.of(otroCarrito));
+            when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
+            when(carritoMapper.updateFromDto(carrito, dtoActualizar)).thenReturn(carrito);
+            when(carritoRepository.save(carrito)).thenReturn(carrito);
+            when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponse);
 
-            assertThrows(CarritoException.class, () -> carritoService.update(1L, dtoConIdDiferente));
-            verify(carritoRepository).findById(2L);
+            CarritoResponseDto result = carritoService.update(1L, dtoActualizar);
+
+            assertNotNull(result);
+            verify(carritoRepository).findById(1L);
+            verify(carritoRepository).save(carrito);
         }
     }
 

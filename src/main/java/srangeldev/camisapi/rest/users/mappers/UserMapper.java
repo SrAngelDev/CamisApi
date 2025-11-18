@@ -14,10 +14,10 @@ public class UserMapper {
      * La contraseña se deja en texto plano para que el servicio la codifique.
      * Los campos como createdAt, updatedAt, etc., se dejan con sus valores
      * por defecto de la entidad.
+     * El idUsuario NO se establece aquí, será generado automáticamente por el servicio.
      */
     public User toUsuario(UserCreateRequestDto createDto) {
         return User.builder()
-                .idUsuario(createDto.getIdUsuario())
                 .nombre(createDto.getNombre())
                 .username(createDto.getUsername())
                 .password(createDto.getPassword())

@@ -14,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class PedidoGraphQLResponse {
 
-    private String id;
-    private String usuario;
+    private Long id;
+    private Long usuario;
     private String fechaPedido;
     private Double total;
     private String estado;

@@ -26,14 +26,18 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class PedidoRequestDto {
-    @NotNull(message = "El usuario no puede ser nulo")
-    private String userId;
+    /**
+     * ID del carrito a partir del cual se creará el pedido
+     * El servicio obtendrá los productos del carrito automáticamente
+     */
+    @NotNull(message = "El ID del carrito no puede ser nulo")
+    @Positive(message = "El ID del carrito debe ser positivo")
+    private Long carritoId;
 
-    @NotNull(message = "El total no puede ser nulo")
-    @Positive(message = "El total debe ser mayor que 0")
-    private Double total;
-
-    @NotNull(message = "Debe incluir al menos un producto")
-    @Size(min = 1, message = "Debe incluir mínimo 1 producto")
-    private List<DetallePedidoDto> detalles;
+    /**
+     * Dirección de envío del pedido
+     */
+    @NotNull(message = "La dirección de envío no puede ser nula")
+    @Size(min = 10, max = 500, message = "La dirección debe tener entre 10 y 500 caracteres")
+    private String direccionEnvio;
 }
