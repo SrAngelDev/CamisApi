@@ -144,5 +144,7 @@ public class UserServiceImpl implements UserService {
         
         // Borrado físico en MongoDB
         userRepository.deleteById(id);
+
+        webSocketHandler.enviarMensajeATodos("Usuario eliminado con id:" +id);
     }
 }
