@@ -6,9 +6,7 @@ import srangeldev.camisapi.rest.productos.dto.ProductoResponseDTO;
 
 import java.util.List;
 
-/**
- * Mapper simple para GraphQL de productos (DAW)
- */
+
 @Component
 public class ProductoGraphQLMapper {
 

@@ -11,9 +11,7 @@ import srangeldev.camisapi.rest.productos.service.ProductoService;
 
 import java.util.List;
 
-/**
- * Controlador GraphQL simple para Productos (DAW) - Solo consultas
- */
+
 @Controller
 public class ProductoGraphQLController {
 
@@ -26,7 +24,6 @@ public class ProductoGraphQLController {
         this.mapper = mapper;
     }
 
-    // CONSULTAS
     @QueryMapping
     public List<ProductoGraphQLResponse> productos() {
         var productos = productoService.listarProductos();

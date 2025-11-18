@@ -6,9 +6,7 @@ import srangeldev.camisapi.rest.pedidos.dto.PedidoResponseDto;
 
 import java.util.List;
 
-/**
- * Mapper simple para GraphQL de pedidos (DAW)
- */
+
 @Component
 public class PedidoGraphQLMapper {
 

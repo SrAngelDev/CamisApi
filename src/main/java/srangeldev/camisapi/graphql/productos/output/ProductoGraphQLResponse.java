@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Output GraphQL simple para producto (DAW)
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,7 +23,6 @@ public class ProductoGraphQLResponse {
     private String fechaCreacion;
     private Boolean esDisponible;
 
-    // Método para calcular disponibilidad
     public Boolean getEsDisponible() {
         return "DISPONIBLE".equals(this.estado);
     }

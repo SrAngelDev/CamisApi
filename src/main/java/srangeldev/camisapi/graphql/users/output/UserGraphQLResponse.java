@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-/**
- * Output GraphQL simple para usuario (DAW)
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,12 +23,10 @@ public class UserGraphQLResponse {
     private Boolean esActivo;
     private Boolean esAdmin;
 
-    // Método para verificar si es admin
     public Boolean getEsAdmin() {
         return this.roles != null && this.roles.contains("ADMIN");
     }
 
-    // Método para verificar si está activo
     public Boolean getEsActivo() {
         return this.username != null;
     }

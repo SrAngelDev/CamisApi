@@ -11,9 +11,7 @@ import srangeldev.camisapi.rest.pedidos.services.PedidoService;
 
 import java.util.List;
 
-/**
- * Controlador GraphQL simple para Pedidos (DAW) - Solo consultas
- */
+
 @Controller
 public class PedidoGraphQLController {
 
@@ -25,8 +23,6 @@ public class PedidoGraphQLController {
         this.pedidoService = pedidoService;
         this.mapper = mapper;
     }
-
-    // CONSULTAS
     @QueryMapping
     public List<PedidoGraphQLResponse> pedidos() {
         var pedidos = pedidoService.listarPedidos();

@@ -10,9 +10,7 @@ import srangeldev.camisapi.rest.carrito.service.CarritoService;
 
 import java.util.List;
 
-/**
- * Controlador GraphQL simple para Carrito (DAW) - Solo consultas
- */
+
 @Controller
 public class CarritoGraphQLController {
 
@@ -25,7 +23,6 @@ public class CarritoGraphQLController {
         this.mapper = mapper;
     }
 
-    // CONSULTAS
     @QueryMapping
     public List<CarritoGraphQLResponse> carritos() {
         var carritos = carritoService.getAll();

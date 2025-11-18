@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Output GraphQL simple para pedido (DAW)
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,12 +25,10 @@ public class PedidoGraphQLResponse {
     private Boolean esPagado;
     private Boolean esEnviado;
 
-    // Método para verificar si está pagado
     public Boolean getEsPagado() {
         return "PAGADO".equals(this.estado) || "ENVIADO".equals(this.estado) || "ENTREGADO".equals(this.estado);
     }
 
-    // Método para verificar si está enviado
     public Boolean getEsEnviado() {
         return "ENVIADO".equals(this.estado) || "ENTREGADO".equals(this.estado);
     }

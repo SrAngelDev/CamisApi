@@ -6,9 +6,7 @@ import srangeldev.camisapi.rest.users.dto.UserResponseDto;
 
 import java.util.List;
 
-/**
- * Mapper simple para GraphQL de usuarios (DAW)
- */
+
 @Component
 public class UserGraphQLMapper {
 

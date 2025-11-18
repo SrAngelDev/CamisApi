@@ -10,9 +10,7 @@ import srangeldev.camisapi.rest.users.services.UserService;
 
 import java.util.List;
 
-/**
- * Controlador GraphQL simple para Usuarios (DAW) - Solo consultas
- */
+
 @Controller
 public class UserGraphQLController {
 
@@ -25,7 +23,6 @@ public class UserGraphQLController {
         this.mapper = mapper;
     }
 
-    // CONSULTAS
     @QueryMapping
     public List<UserGraphQLResponse> usuarios() {
         var usuarios = userService.findAll();
