@@ -20,21 +20,9 @@ public class ProductoController {
     private final ProductoService productoService;
 
     /**
-     * Crear un nuevo producto
-     */
-    @PostMapping
-    public ResponseEntity<ProductoResponseDTO> crearProducto(
-            @Valid
-            @RequestBody ProductoRequestDTO productoRequestDTO) {
-
-        ProductoResponseDTO nuevoProducto = productoService.crearProducto(productoRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
-    }
-
-    /**
      * Listar todos los productos
      */
-    @GetMapping
+    @GetMapping({"", "/"})
     public ResponseEntity<List<ProductoResponseDTO>> listarProductos() {
         List<ProductoResponseDTO> productos = productoService.listarProductos();
         return ResponseEntity.ok(productos);
@@ -48,6 +36,18 @@ public class ProductoController {
     public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable String id) {
         ProductoResponseDTO producto = productoService.obtenerPorId(id);
         return ResponseEntity.ok(producto);
+    }
+
+    /**
+     * Crear un nuevo producto
+     */
+    @PostMapping
+    public ResponseEntity<ProductoResponseDTO> crearProducto(
+            @Valid
+            @RequestBody ProductoRequestDTO productoRequestDTO) {
+
+        ProductoResponseDTO nuevoProducto = productoService.crearProducto(productoRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
     }
 
     /**

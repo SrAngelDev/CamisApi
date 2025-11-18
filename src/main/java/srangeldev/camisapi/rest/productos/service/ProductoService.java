@@ -1,12 +1,11 @@
 package srangeldev.camisapi.rest.productos.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.socket.WebSocketHandler;
 import srangeldev.camisapi.rest.productos.dto.ProductoRequestDTO;
 import srangeldev.camisapi.rest.productos.dto.ProductoResponseDTO;
@@ -16,29 +15,41 @@ import srangeldev.camisapi.rest.productos.models.EstadoProducto;
 import srangeldev.camisapi.rest.productos.models.Producto;
 import srangeldev.camisapi.rest.productos.repository.ProductoRepository;
 
-import java.time.LocalDate;
+
 import java.util.List;
 
 @Service
-@Validated
-@RequiredArgsConstructor
 @CacheConfig (cacheNames = {"productos"})
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final ProductoMapper productoMapper;
     private final WebSocketHandler productosWebSocketHandler;
+    private final srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler;
+
+    @Autowired
+    public ProductoService(ProductoRepository repository, ProductoMapper mapper, WebSocketHandler productosWebSocketHandler, srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler) {
+        this.productoRepository = repository;
+        this.productoMapper = mapper;
+        this.productosWebSocketHandler = productosWebSocketHandler;
+        this.webSocketHandler = webSocketHandler;
+    }
 
     /**
      * Devuelve todos los productos del catálogo.
      */
     @Cacheable("productos")
     public List<ProductoResponseDTO> listarProductos() {
-        return productoRepository.findAll()
+        List<ProductoResponseDTO> productos = productoRepository.findAll()
                 .stream()
                 .map(productoMapper::toDTO)
                 .toList();
+
+        webSocketHandler.enviarMensajeATodos("Productos listados correctamente");
+
+        return productos;
     }
+
 
     /**
      * Busca un producto por su ID.
@@ -48,6 +59,7 @@ public class ProductoService {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNotFound("No se encontró el producto con ID: " + id));
 
+        webSocketHandler.enviarMensajeATodos("Producto obtenido con id:" +id );
         return productoMapper.toDTO(producto);
     }
 
@@ -59,11 +71,9 @@ public class ProductoService {
     public ProductoResponseDTO crearProducto(ProductoRequestDTO dto) {
         Producto producto = productoMapper.toEntity(dto);
 
-        if (producto.getFechaCreacion() == null) {
-            producto.setFechaCreacion(LocalDate.now());
-        }
-
         Producto guardado = productoRepository.save(producto);
+
+        webSocketHandler.enviarMensajeATodos("Producto creado:" +producto.getNombre());
         return productoMapper.toDTO(guardado);
     }
 
@@ -84,6 +94,8 @@ public class ProductoService {
         existente.setEstado(dto.getEstado());
 
         Producto actualizado = productoRepository.save(existente);
+
+        webSocketHandler.enviarMensajeATodos("Producto actualizado con id:" +id );
         return productoMapper.toDTO(actualizado);
     }
 
@@ -92,10 +104,11 @@ public class ProductoService {
      */
     @CacheEvict(key = "#id")
     public void eliminarProducto(String id) {
-        if (!productoRepository.existsById(id)) {
-            throw new ProductoNotFound("No se puede eliminar. No existe el producto con ID: " + id);
-        }
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(()-> new ProductoNotFound("No se encontro el producto con ID: " + id));
+
         productoRepository.deleteById(id);
+        webSocketHandler.enviarMensajeATodos("Producto eliminado con id" +id );
     }
 
     /**
