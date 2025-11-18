@@ -117,6 +117,6 @@ Los módulos principales publicados en la API REST son:
 
 ## Equipo:
 - Marcos Jodar
-- Jorge Luis
+- Jorge Morgado
 - Cristian Ortega
-- Angel Luis
+- Angel Sanchez
